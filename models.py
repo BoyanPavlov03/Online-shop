@@ -6,10 +6,16 @@ from database import Base
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    email = Column(String(100), unique=True, nullable=False)
+    email = Column(String(80), unique=True, nullable=False)
     username = Column(String(80), unique=True, nullable=False)
     password = Column(String(120), unique=True, nullable=False)
     login_id = Column(String(36), nullable=True)
+    special_code = Column(String(6), nullable=True)
+
+    @property
+    def is_administrator(self):
+        if special_code:
+            return True
 
     @property
     def is_authenticated(self):
