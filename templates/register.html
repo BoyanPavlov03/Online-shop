@@ -1,44 +1,65 @@
-{% extends "index.html" %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
 
-{% block title %} Register {% endblock %}
+    <link rel="stylesheet" href="../static/csslogin/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/csslogin/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/csslogin/style.css">
 
-{% block content %}
-<div class="row">
-    <div class="col-5 mx-auto align-middle">
-        <div class="card mt-5">
-            <div class="card-body">
-                <h5 class="card-title">Registration Form</h5>
-                <form method="POST">
-                    <div class="form-group">
-                        <label for="InputEmail">Email<a style="color:red"> *</a></label>
-                        <input type="email" class="form-control" name="email" id="InputEmail" placeholder="example@gmail.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="InputUsername">Username<a style="color:red"> *</a></label>
-                        <input type="text" class="form-control" name="username" id="InputUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="InputPassword">Password<a style="color:red"> *</a></label>
-                        <input type="password" class="form-control" name="password" id="InputPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="InputConfirmPassword">Confirm Password<a style="color:red"> *</a></label>
-                        <input type="password" class="form-control" name="confirm_password" id="InputConfirmPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="InputCode">Special Code</label>
-                        <input type="text" class="form-control" name="administrator_code" id="InputCode">
-                    </div>
-                    <button type="submit" style="margin-top:8px" class="btn btn-primary">Register</button>
-                    <div>
-                        <a style="color:red"> *</a> - required for registration!
-                    </div>
-                </form>
-                <div>
-                    <a href="/login"><button type="submit" style="margin-top:5px" class="btn btn-secondary btn-sm">Have an account</button>
+    <script src="../static/jslogin/jquery-3.3.1.min.js"></script>
+    <script src="../static/jslogin/bootstrap.min.js"></script>
+    <script src="../static/jslogin/main.js"></script>
+
+    <title>Login</title>
+  </head>
+  <body>
+  
+  <div class="content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 contents">
+          <div class="row justify-content-center">
+            <div class="col-md-12">
+              <div class="form-block">
+                  <div class="mb-4">
+                  <h3>Sign Up to the </h3><h3><strong><a href="/home">Commissioner Shop</a></strong></h3>
                 </div>
+                <form action="/register" method="POST">
+                  <div class="form-group">
+                    <label for="username">Email<a style="color:red"> *</a></label>
+                    <input type="username" name="email" id="exampleInputPassword1" class="form-control" aria-describedby="usernameHelp" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="username">Username<a style="color:red"> *</a></label>
+                    <input type="username" name="username" id="exampleInputPassword1" class="form-control" aria-describedby="usernameHelp" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password<a style="color:red"> *</a></label>
+                    <input type="password" name="password" id="exampleInputPassword1" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="InputConfirmPassword">Confirm Password<a style="color:red"> *</a></label>
+                      <input type="password" class="form-control" name="confirm_password" id="InputConfirmPassword" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="InputCode">Special Code</label>
+                      <input type="text" class="form-control" name="administrator_code" id="InputCode">
+                  </div>
+                  <input type="submit" value="Register" class="btn btn-pill text-white btn-block btn-primary">
+
+                  <span class="d-block text-center my-4 text-muted">Already a member? <a href="/login"> Sign in!</a></span>
+                </form>
+              </div>
             </div>
+          </div>
+          
         </div>
+        
+      </div>
     </div>
-</div>
-{% endblock %}
+  </div>
+  </body>
+</html>

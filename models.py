@@ -1,5 +1,5 @@
 from flask import Flask,request,session,url_for,redirect,render_template,make_response,flash
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from datetime import datetime
 from database import Base
 
@@ -14,8 +14,9 @@ class User(Base):
 
     @property
     def is_administrator(self):
-        if special_code:
+        if self.special_code:
             return True
+        return False
 
     @property
     def is_authenticated(self):
@@ -33,4 +34,21 @@ class User(Base):
         return self.login_id
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.username    
+
+class Product(Base):
+    __tablename__ = 'product'
+    id = Column(Integer, primary_key=True)
+    price = Column(String(80), unique=True, nullable=False)
+    rating =  Column(String(80), unique=True, nullable=False)
+    shopping_id = Column(Integer, ForeignKey("user.id"))
+    wish_id = Column(Integer, ForeignKey("user.id"))
+    
+class Address(Base):
+    __tablename__ = 'address'
+    id = Column(Integer, primary_key=True)
+    postal_code = Column(String(10), unique=True, nullable=False)
+    town = Column(String(80), unique=True, nullable=False)
+    street = Column(String(150), unique=True, nullable=False)
+    delivery = Column(String(80), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))

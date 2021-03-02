@@ -6,7 +6,7 @@ import uuid
 from sqlalchemy import asc
 from datetime import datetime
 
-from models import User
+from models import User, Product, Address
 from login import login_manager
 from database import db_session, init_db
 
@@ -25,7 +25,7 @@ def index():
 
 @app.route('/home')
 def home():
-    return render_template("home.html")
+    return render_template("index.html")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
