@@ -6,18 +6,41 @@
     <div class="header-services"></div>
     <main class="ps-main">
       <div class="ps-section--features-product ps-section masonry-root pt-100 pb-100">
+        <hr>
         <div class="ps-container">
           <div class="ps-section__header mb-50">
-            <h3 class="ps-section__title" data-mask="features">- Products</h3>
+            <h3 class="ps-section__title">- Products</h3>
             <ul class="ps-masonry__filter">
               <li class="current"><a href="#" data-filter="*">All</a></li>
-              <li><a href="#" data-filter=".books">Books</a></li>
-              <li><a href="#" data-filter=".mobiles">Mobiles</a></li>
-              <li><a href="#" data-filter=".movies">Movies</a></li>
-              <li><a href="#" data-filter=".electronics">Electronics</a></li>
+              {% for category in categories %}
+              <li><a href="#" ">{{category.name}}</a></li>
+              {% endfor %}
             </ul>
+            <div class="ps-section__content pb-50">
+                  <div class="masonry-wrapper" data-col-md="4" data-col-sm="2" data-col-xs="1" data-gap="30" data-radio="100%">
+                    <div class="ps-masonry">
+                      <div class="grid-sizer"></div>
+                      {% for product in products %}
+                      <div class="grid-item">
+                        <div class="grid-item__content-wrapper">
+                          <div class="ps-shoe mb-30">
+                            <div class="ps-shoe__thumbnail">
+                                <img src="../static/images/1.jpg" alt=""><a class="ps-shoe__overlay" href="product-detail.html"></a>
+                            </div>
+                            <div class="ps-shoe__content">
+                              <div class="ps-shoe__detail"><a class="ps-shoe__name" href="#">{{product.name}}</a><span class="ps-shoe__price">£ {{product.price}}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
           </div>
         </div>
       </div>
     </main>
+    
 {% endblock %}

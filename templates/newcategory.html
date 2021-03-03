@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../static/csslogin/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/csslogin/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/csslogin/style.css">
+
+    <script src="../static/jslogin/jquery-3.3.1.min.js"></script>
+    <script src="../static/jslogin/bootstrap.min.js"></script>
+    <script src="../static/jslogin/main.js"></script>
+
+    <title>New category</title>
+  </head>
+  <body>
+  <div class="content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 contents">
+          <div class="row justify-content-center">
+            <div class="col-md-12">
+              <div class="form-block">
+                  <div class="mb-4">
+                  <h3>Creating new category</h3>
+                </div>
+                <form action="/newcategory" method="POST">
+                  <div class="form-group">
+                    <label for="category">Category's name</label>
+                    <input type="category" name="category" id="exampleInputCategory" class="form-control" aria-describedby="categoryHelp" required>
+
+                  </div>
+                  <div class="form-group">
+                      <label for="InputCode">Special Code(For security)</label>
+                      <input type="text" class="form-control" name="administrator_code" id="InputCode">
+                  </div>
+                  <input type="submit" value="Create" class="btn btn-pill text-white btn-block btn-primary">
+
+                  <span class="d-block text-center my-4 text-muted">You don't want to create a new category! <a href="/home"> Go Back</a></span>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

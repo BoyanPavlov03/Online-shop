@@ -36,13 +36,21 @@ class User(Base):
     def __repr__(self):
         return '<User %r>' % self.username    
 
+class Category(Base):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True, nullable=False)
+
 class Product(Base):
     __tablename__ = 'product'
     id = Column(Integer, primary_key=True)
-    price = Column(String(80), unique=True, nullable=False)
-    rating =  Column(String(80), unique=True, nullable=False)
+    name = Column(String(50), unique=True, nullable=False)
+    description = Column(String(800), unique=False, nullable=False)
+    price = Column(String(80), unique=False, nullable=False)
+    rating =  Column(String(80), unique=False, nullable=False)
     shopping_id = Column(Integer, ForeignKey("user.id"))
     wish_id = Column(Integer, ForeignKey("user.id"))
+    category_id = Column(Integer, ForeignKey("category.id"))
     
 class Address(Base):
     __tablename__ = 'address'

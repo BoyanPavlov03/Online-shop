@@ -6,7 +6,7 @@ import uuid
 from sqlalchemy import asc
 from datetime import datetime
 
-from models import User, Product, Address
+from models import User, Product, Address, Category
 from login import login_manager
 from database import db_session, init_db
 
@@ -25,7 +25,53 @@ def index():
 
 @app.route('/home')
 def home():
-    return render_template("index.html")
+    return render_template("index.html",count = Category.query.count(),categories = Category.query.all(),products = Product.query.all())
+
+@app.route('/newcategory', methods=['GET', 'POST'])
+@login_required
+def newcategory():
+    if current_user.is_administrator == False:
+        return redirect(url_for('home'))
+        
+    if request.method == 'POST':
+        name = request.form.get('category')
+        special_code = request.form.get('administrator_code')
+        if special_code == secret_code:
+            category = Category(name=name)
+        else:
+            return redirect(url_for('home'))
+        
+        db_session.add(category)
+        db_session.commit()
+        
+        return redirect(url_for('home'))
+        
+    return render_template('newcategory.html')
+
+@app.route('/newproduct', methods=['GET', 'POST'])
+@login_required
+def newproduct():
+    if current_user.is_administrator == False:
+        return redirect(url_for('home'))
+        
+    if request.method == 'POST':
+        name = request.form.get('product')
+        description = request.form.get('description')
+        price = request.form.get('price')
+        category = request.form.get('category')
+        special_code = request.form.get('administrator_code')
+        
+        if special_code == secret_code:
+            product = Product(name=name,description=description,price=price,rating=5,category_id=category)
+        else:
+            return redirect(url_for('home'))
+        
+        db_session.add(product)
+        db_session.commit()
+        
+        return redirect(url_for('home'))
+        
+    return render_template('newproduct.html',categories = Category.query.all())
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -88,10 +134,3 @@ def logout():
     db_session.commit()
     logout_user()
     return redirect(url_for('home'))
-    
-    
-    
-    
-    
-    
-    

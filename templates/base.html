@@ -55,7 +55,7 @@
     {% block head %}
     {% endblock %}
 </head>
-<body class="ps-loading">
+<body>
     <div class="header--sidebar"></div>
     <header class="header">
       <div class="header__top">
@@ -64,7 +64,8 @@
             {% if current_user.login_id %}
             <div class="header__actions"><a href="/logout">Logout</a></div>
             {% else %}
-            <div class="header__actions"><a href="/login">Login & Regiser</a></div>
+            <div class="header__actions"><a href="/register">Register</a></div>
+            <div class="header__actions"><a href="/login">Login</a></div>
             {% endif %}
           </div>
         </div>
@@ -80,7 +81,12 @@
                   <li class="menu-item"><a href="/home">WishList</a></li>
                   <li class="menu-item"><a href="/home">My Address</a></li>
                   {% if current_user.is_administrator %}
-                  <li class="menu-item"><a href="/home">New Category</a></li>
+                  {% if count < 7 %}
+                  <li class="menu-item"><a href="/newcategory">New Category</a></li>
+                  {% endif %}
+                  {% if count > 0 %}
+                  <li class="menu-item"><a href="/newproduct">New Product</a></li>
+                  {% endif %}
                   {% endif %}
                 </ul>
           </div>
