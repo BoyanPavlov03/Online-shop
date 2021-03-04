@@ -3,44 +3,101 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
-    <div class="header-services"></div>
-    <main class="ps-main">
-      <div class="ps-section--features-product ps-section masonry-root pt-100 pb-100">
-        <hr>
-        <div class="ps-container">
-          <div class="ps-section__header mb-50">
-            <h3 class="ps-section__title">- Products</h3>
-            <ul class="ps-masonry__filter">
-              <li class="current"><a href="#" data-filter="*">All</a></li>
-              {% for category in categories %}
-              <li><a href="#" ">{{category.name}}</a></li>
-              {% endfor %}
-            </ul>
-            <div class="ps-section__content pb-50">
-                  <div class="masonry-wrapper" data-col-md="4" data-col-sm="2" data-col-xs="1" data-gap="30" data-radio="100%">
-                    <div class="ps-masonry">
-                      <div class="grid-sizer"></div>
-                      {% for product in products %}
-                      <div class="grid-item">
-                        <div class="grid-item__content-wrapper">
-                          <div class="ps-shoe mb-30">
-                            <div class="ps-shoe__thumbnail">
-                                <img src="../static/images/1.jpg" alt=""><a class="ps-shoe__overlay" href="product-detail.html"></a>
-                            </div>
-                            <div class="ps-shoe__content">
-                              <div class="ps-shoe__detail"><a class="ps-shoe__name" href="#">{{product.name}}</a><span class="ps-shoe__price">£ {{product.price}}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-          </div>
+<section class="banner-area organic-breadcrumb">
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xl-3 col-lg-4 col-md-5">
+            <div class="sidebar-categories">
+                <div class="head">Browse Categories</div>
+                <ul class="main-categories">
+                    <li class="main-nav-list"><a data-toggle="collapse" href="#fruitsVegetable" aria-expanded="false" aria-controls="fruitsVegetable"><span class="lnr lnr-arrow-right"></span>Fruits and Vegetables<span class="number">(53)</span></a></li>
+                    <li class="main-nav-list"><a data-toggle="collapse" href="#cooking" aria-expanded="false" aria-controls="cooking"><span class="lnr lnr-arrow-right"></span>Cooking<span class="number">(53)</span></a></li>
+                    <li class="main-nav-list"><a class="border-bottom-0" data-toggle="collapse" href="#babyCare" aria-expanded="false" aria-controls="babyCare"><span class="lnr lnr-arrow-right"></span>Baby Care<span class="number">(48)</span></a></li>
+                </ul>
+            </div>
         </div>
-      </div>
-    </main>
+            
+        <div class="col-xl-9 col-lg-8 col-md-7">
+                
+            <div class="filter-bar d-flex flex-wrap align-items-center"></div>
+                    
+            <section class="lattest-product-area pb-40 category-list">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="single-product">
+                            <img class="img-fluid" src="../static/img/p1.jpg" alt="">
+                                <div class="product-details">
+                                <h6>addidas New Hammer sole
+                                for Sports person</h6>
+                                <div class="price">
+                                    <h6>$150.00</h6>
+                                    <h6 class="l-through">$210.00</h6>
+                                </div>
+                                <div class="prd-bottom">
+                                    <a href="" class="social-info">
+                                        <span class="ti-bag"></span>
+                                        <p class="hover-text">add to bag</p>
+                                    </a>
+                                    <a href="" class="social-info">
+                                        <span class="lnr lnr-heart"></span>
+                                        <p class="hover-text">Wishlist</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="single-product">
+                            <img class="img-fluid" src="../static/img/p1.jpg" alt="">
+                                <div class="product-details">
+                                <h6>addidas New Hammer sole
+                                for Sports person</h6>
+                                <div class="price">
+                                    <h6>$150.00</h6>
+                                    <h6 class="l-through">$210.00</h6>
+                                </div>
+                                <div class="prd-bottom">
+                                    <a href="" class="social-info">
+                                        <span class="ti-bag"></span>
+                                        <p class="hover-text">add to bag</p>
+                                    </a>
+                                    <a href="" class="social-info">
+                                        <span class="lnr lnr-heart"></span>
+                                        <p class="hover-text">Wishlist</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="single-product">
+                            <img class="img-fluid" src="../static/img/p1.jpg" alt="">
+                                <div class="product-details">
+                                <h6>addidas New Hammer sole
+                                for Sports person</h6>
+                                <div class="price">
+                                    <h6>$150.00</h6>
+                                    <h6 class="l-through">$210.00</h6>
+                                </div>
+                                <div class="prd-bottom">
+                                    <a href="" class="social-info">
+                                        <span class="ti-bag"></span>
+                                        <p class="hover-text">add to bag</p>
+                                    </a>
+                                    <a href="" class="social-info">
+                                        <span class="lnr lnr-heart"></span>
+                                        <p class="hover-text">Wishlist</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
     
 {% endblock %}
