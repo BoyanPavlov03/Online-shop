@@ -38,6 +38,24 @@ def addcart(product_id):
     
     return redirect(url_for('home'))
     
+@app.route('/addcartfromwish/<int:product_id>', methods=['GET','POST'])
+@login_required
+def addcartfromwish(product_id):
+    cart = Cart(user_id=current_user.id,product_id=product_id)
+    db.session.add(cart)
+    db.session.commit()
+    
+    return redirect(url_for('wishlist'))
+    
+@app.route("/removecart/<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def removecart(product_id):
+    cart = Cart.query.filter_by(product_id=product_id).first()
+    db.session.delete(cart)
+    db.session.commit()
+
+    return redirect(url_for('cart'))
+    
 @app.route('/addwish/<int:product_id>', methods=['GET','POST'])
 @login_required
 def addwish(product_id):
@@ -46,6 +64,15 @@ def addwish(product_id):
     db.session.commit()
     
     return redirect(url_for('home'))
+    
+@app.route("/removewish/<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def removewish(product_id):
+    wish = Wish.query.filter_by(product_id=product_id).first()
+    db.session.delete(wish)
+    db.session.commit()
+
+    return redirect(url_for('wishlist'))
     
 @app.route('/newcategory', methods=['GET', 'POST'])
 @login_required
@@ -119,6 +146,12 @@ def cart():
         total += r[0].price
     
     return render_template("cart.html",products=result,total=total)
+    
+@app.route('/wishlist')
+def wishlist():
+    result=db.session.query(Product,Wish).outerjoin(Product, Product.id == Wish.product_id).all()
+    
+    return render_template("wishlist.html",products=result)
     
 @app.route('/category/<int:category_id>')
 def category(category_id):
