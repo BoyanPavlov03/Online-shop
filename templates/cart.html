@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %} Cart {% endblock %}
+
+{% block content %}
+<section class="banner-area organic-breadcrumb">
+</section>
+
+
+<section class="cart_area">
+    <div class="container">
+        <div class="cart_inner">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <div class="media">
+                                    <div class="d-flex">
+                                        <img src="../static/img/cart.png" alt="">
+                                    </div>
+                                    <div class="media-body">
+                                        <p>{{product[0].name}}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <h5>${{product[0].price}}</h5>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>
+                                <h5>Subtotal</h5>
+                            </td>
+                            <td>
+                                <h5>${{total}}</h5>
+                            </td>
+                        </tr>
+                        <tr class="out_button_area">
+                            <td>
+                            </td>
+                            <td>
+                                <div class="checkout_btn_inner d-flex align-items-center">
+                                    <a class="gray_btn" href="/home">Continue Shopping</a>
+                                    <a class="primary-btn" href="/home">Proceed to checkout</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

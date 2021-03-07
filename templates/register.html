@@ -21,6 +21,11 @@
             </div>
             <div class="col-lg-6">
                 <div class="login_form_inner">
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                      <h3 style="color:red;margin-top:-40px">{{messages[0]}}</h3>
+                      {% endif %}
+                    {% endwith %}
                     <h3>Register to enter</h3>
                     <form class="row login_form" action="/register" method="POST">
                         <div class="col-md-12 form-group">

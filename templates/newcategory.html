@@ -1,51 +1,42 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+{% extends "base.html" %}
 
-    <link rel="stylesheet" href="../static/csslogin/owl.carousel.min.css">
-    <link rel="stylesheet" href="../static/csslogin/bootstrap.min.css">
-    <link rel="stylesheet" href="../static/csslogin/style.css">
+{% block title %} New Category {% endblock %}
 
-    <script src="../static/jslogin/jquery-3.3.1.min.js"></script>
-    <script src="../static/jslogin/bootstrap.min.js"></script>
-    <script src="../static/jslogin/main.js"></script>
+{% block content %}
+<section class="banner-area organic-breadcrumb">
+</section>
 
-    <title>New category</title>
-  </head>
-  <body>
-  <div class="content">
+<section class="login_box_area section_gap">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6 contents">
-          <div class="row justify-content-center">
-            <div class="col-md-12">
-              <div class="form-block">
-                  <div class="mb-4">
-                  <h3>Creating new category</h3>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login_box_img">
+                    <img class="img-fluid" src="../static/img/login.jpg" alt="">
                 </div>
-                <form action="/newcategory" method="POST">
-                  <div class="form-group">
-                    <label for="category">Category's name</label>
-                    <input type="category" name="category" id="exampleInputCategory" class="form-control" aria-describedby="categoryHelp" required>
-
-                  </div>
-                  <div class="form-group">
-                      <label for="InputCode">Special Code(For security)</label>
-                      <input type="text" class="form-control" name="administrator_code" id="InputCode">
-                  </div>
-                  <input type="submit" value="Create" class="btn btn-pill text-white btn-block btn-primary">
-
-                  <span class="d-block text-center my-4 text-muted">You don't want to create a new category! <a href="/home"> Go Back</a></span>
-                </form>
-              </div>
             </div>
-          </div>
+            <div class="col-lg-6">
+                <div class="login_form_inner">
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                      <h3 style="color:red;margin-top:-40px">{{messages[0]}}</h3>
+                      {% endif %}
+                    {% endwith %}
+                    <h3>Creating a category</h3>
+                    <form class="row login_form" action="/newcategory" method="POST">
+                        <div class="col-md-12 form-group">
+                            <input type="category" class="form-control" id="category" name="category" placeholder="Category name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Category name'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="special_code" name="administrator_code" placeholder="Special Code(for security)" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Special code'">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="primary-btn">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  </body>
-</html>
+</section>
+
+{% endblock %}
