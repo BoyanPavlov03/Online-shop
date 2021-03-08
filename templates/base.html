@@ -68,7 +68,9 @@
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin Settings</a>
                                 <ul class="dropdown-menu">
                                     <li class="nav-item"><a class="nav-link" href="/newcategory">New Category</a></li>
+                                    {% if categories %}
                                     <li class="nav-item"><a class="nav-link" href="/newproduct">New Product</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
                             {% endif %}
