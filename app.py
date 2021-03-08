@@ -7,6 +7,7 @@ import uuid
 from models import User, Product, Address, Category, Cart, Wish, Rating
 from login import login_manager
 from database import db
+from flask_msearch import Search
 
 app = Flask (__name__)
 app.config ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
@@ -16,6 +17,8 @@ app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
 secret_code = "admin1"
 
 db.init_app(app)
+search = Search()
+search.init_app(app)
 with app.app_context():
     db.create_all()
 
@@ -24,6 +27,18 @@ login_manager.init_app(app)
 @app.route('/')
 def index():
     return redirect(url_for('home'))
+    
+@app.route('/home')
+def home():
+    return render_template("index.html",categories = Category.query.all(),products = Product.query.all())
+        
+@app.route('/search', methods=['GET','POST'])
+def search():  
+    keyword = request.form.get('q')
+    
+    result = Product.query.msearch(keyword,fields=['name'])
+        
+    return render_template("index.html",products=result,categories = Category.query.all())
     
 @app.route('/addrating/<int:product_id>', methods=['GET','POST'])
 @login_required
@@ -46,9 +61,6 @@ def addrating(product_id):
         
     return redirect(url_for('product',product_id=product_id))
     
-@app.route('/home')
-def home():
-    return render_template("index.html",categories = Category.query.all(),products = Product.query.all())
 
 @app.route('/addcart/<int:product_id>', methods=['GET','POST'])
 @login_required
