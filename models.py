@@ -39,18 +39,18 @@ class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(Integer, primary_key=True)
     name = db.Column(String(50), unique=True, nullable=False)
-    count = db.Column(Integer, unique=False, nullable=True, default=0)
 
 class Product(db.Model):
-    __searchable__ = ['name']
     __tablename__ = 'product'
+    __searchable__ = ['name']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    short_description = db.Column(db.String(80), unique=False, nullable=False)
     description = db.Column(db.String(800), unique=False, nullable=False)
     price = db.Column(db.Float, unique=False, nullable=False)
-    rating =  db.Column(db.String(80), unique=False, nullable=False)
+    rating =  db.Column(db.Float, unique=False, nullable=False)
+    rating_count = db.Column(Integer, unique=False, nullable=True, default=0)
     category_id = db.Column(db.Integer, ForeignKey("category.id"))
-    carts = db.relationship('Cart', backref='product')
     
 class Cart(db.Model):
     __tablename__ = 'cart'
@@ -63,6 +63,13 @@ class Wish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
+    
+class Rating(db.Model):
+    __tablename__ = 'rating'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey("user.id"))
+    product_id = db.Column(db.Integer, ForeignKey('product.id'))
+    rating =  db.Column(db.Integer, unique=False, nullable=False)
     
 class Address(db.Model):
     __tablename__ = 'address'

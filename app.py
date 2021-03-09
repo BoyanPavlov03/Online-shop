@@ -4,9 +4,10 @@ from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user, logout_user
 import uuid
 
-from models import User, Product, Address, Category, Cart, Wish
+from models import User, Product, Address, Category, Cart, Wish, Rating
 from login import login_manager
 from database import db
+from flask_msearch import Search
 
 app = Flask (__name__)
 app.config ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
@@ -16,6 +17,8 @@ app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
 secret_code = "admin1"
 
 db.init_app(app)
+search = Search()
+search.init_app(app)
 with app.app_context():
     db.create_all()
 
@@ -27,7 +30,37 @@ def index():
     
 @app.route('/home')
 def home():
-    return render_template("index.html" ,categories = Category.query.all(),products = Product.query.all())
+    return render_template("index.html",categories = Category.query.all(),products = Product.query.all())
+        
+@app.route('/search', methods=['GET','POST'])
+def search():  
+    keyword = request.form.get('q')
+    
+    result = Product.query.msearch(keyword,fields=['name'])
+        
+    return render_template("index.html",products=result,categories = Category.query.all())
+    
+@app.route('/addrating/<int:product_id>', methods=['GET','POST'])
+@login_required
+def addrating(product_id):
+    if request.method == 'POST':
+        rating = request.form.get('rating')
+        rating = float(rating)
+        if rating > 5 or rating < 0:
+            return redirect(url_for('product',product_id=product_id))
+            
+        if Rating.query.filter_by(user_id=current_user.id).first():
+            return redirect(url_for('product',product_id=product_id))
+        
+        r = Rating(user_id=current_user.id,product_id=product_id,rating=rating)
+        product = Product.query.filter_by(id=product_id).first()
+        product.rating_count += 1
+        
+        db.session.add(r)
+        db.session.commit()
+        
+    return redirect(url_for('product',product_id=product_id))
+    
 
 @app.route('/addcart/<int:product_id>', methods=['GET','POST'])
 @login_required
@@ -38,6 +71,42 @@ def addcart(product_id):
     
     return redirect(url_for('home'))
     
+@app.route('/addcartfromwish/<int:product_id>', methods=['GET','POST'])
+@login_required
+def addcartfromwish(product_id):
+    cart = Cart(user_id=current_user.id,product_id=product_id)
+    db.session.add(cart)
+    db.session.commit()
+    
+    return redirect(url_for('wishlist'))
+    
+@app.route('/addcartfromproduct/<int:product_id>', methods=['GET','POST'])
+@login_required
+def addcartfromproduct(product_id):
+    cart = Cart(user_id=current_user.id,product_id=product_id)
+    db.session.add(cart)
+    db.session.commit()
+    
+    return redirect(url_for('product',product_id=product_id))
+    
+@app.route('/addwishfromproduct/<int:product_id>', methods=['GET','POST'])
+@login_required
+def addwishfromproduct(product_id):
+    wish = Wish(user_id=current_user.id,product_id=product_id)
+    db.session.add(wish)
+    db.session.commit()
+    
+    return redirect(url_for('product',product_id=product_id))
+    
+@app.route("/removecart/<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def removecart(product_id):
+    cart = Cart.query.filter_by(product_id=product_id).first()
+    db.session.delete(cart)
+    db.session.commit()
+
+    return redirect(url_for('cart'))
+    
 @app.route('/addwish/<int:product_id>', methods=['GET','POST'])
 @login_required
 def addwish(product_id):
@@ -46,6 +115,15 @@ def addwish(product_id):
     db.session.commit()
     
     return redirect(url_for('home'))
+    
+@app.route("/removewish/<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def removewish(product_id):
+    wish = Wish.query.filter_by(product_id=product_id).first()
+    db.session.delete(wish)
+    db.session.commit()
+
+    return redirect(url_for('wishlist'))
     
 @app.route('/newcategory', methods=['GET', 'POST'])
 @login_required
@@ -60,12 +138,8 @@ def newcategory():
         if category_check:
             flash("This category exists!","danger")
             return redirect(url_for('newcategory'))
-            
-        special_code = request.form.get('administrator_code')
-        if special_code == secret_code:
-            category = Category(name=name)
-        else:
-            return redirect(url_for('home'))
+
+        category = Category(name=name)
         
         db.session.add(category)
         db.session.commit()
@@ -82,23 +156,17 @@ def newproduct():
         
     if request.method == 'POST':
         name = request.form.get('product')
+        short_description = request.form.get('short_description')
         description = request.form.get('description')
         price = request.form.get('price')
         category = request.form.get('category')
-        special_code = request.form.get('administrator_code')
         
         product_check = Product.query.filter_by(name=name).first()
         if product_check:
             flash("This product exists!","danger")
             return redirect(url_for('newproduct'))
-        
-        if special_code == secret_code:
-            product = Product(name=name,description=description,price=price,rating=5,category_id=category)
-        else:
-            return redirect(url_for('home'))
-        
-        category = Category.query.filter_by(id=category).first()
-        category.count += 1
+            
+        product = Product(name=name,short_description=short_description,description=description,price=price,rating=0,category_id=category)
     
         db.session.add(product)
         db.session.commit()
@@ -107,9 +175,20 @@ def newproduct():
         
     return render_template('newproduct.html',categories = Category.query.all())
 
-@app.route('/productdetails')
-def productdetails():
-    return render_template("product_details.html")
+@app.route('/product/<int:product_id>')
+def product(product_id):
+    ratings=Rating.query.filter_by(product_id=product_id).all()
+    product=Product.query.filter_by(id=product_id).first()
+    category=Category.query.filter_by(id=product.category_id).first()
+    
+    total = 0
+    for r in ratings:
+        total += r.rating
+    
+    if product.rating_count != 0:
+        product.rating = total / product.rating_count
+    
+    return render_template("product_details.html",product=product,category=category)
 
 @app.route('/cart')
 def cart():
@@ -119,6 +198,12 @@ def cart():
         total += r[0].price
     
     return render_template("cart.html",products=result,total=total)
+    
+@app.route('/wishlist')
+def wishlist():
+    result=db.session.query(Product,Wish).outerjoin(Product, Product.id == Wish.product_id).all()
+    
+    return render_template("wishlist.html",products=result)
     
 @app.route('/category/<int:category_id>')
 def category(category_id):

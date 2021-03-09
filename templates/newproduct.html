@@ -27,13 +27,13 @@
                             <input type="product" class="form-control" id="product" name="product" placeholder="Product name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Product name'" required>
                         </div>
                         <div class="col-md-12 form-group">
-                            <input type="description" class="form-control" id="description" name="description" placeholder="Description" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Description'" required>
+                            <input type="text" class="form-control" id="short_description" name="short_description" placeholder="Short Description" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Short Description'" maxlength="80" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="description" class="form-control" id="description" name="description" placeholder="Description" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Description'" maxlength="800" required>
                         </div>
                         <div class="col-md-12 form-group">
                             <input type="price" class="form-control" id="price" name="price" placeholder="Price" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Price'" required>
-                        </div>
-                        <div class="col-md-12 form-group">
-                            <input type="text" class="form-control" id="special_code" name="administrator_code" placeholder="Special Code(for security)" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Special code'">
                         </div>
                         <div class="col-md-12 form-group">
                           <select style="margin-left:55px" type="category" name="category" id = "myList">

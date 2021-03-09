@@ -35,27 +35,21 @@
                                 <h5>${{product[0].price}}</h5>
                             </td>
                             <td>
-                                <a class="gray_btn" href="/removecart/{{product[0].id}}">Remove</a>
+                                <a style="margin-left:135px" class="gray_btn" href="/addcartfromwish/{{product[0].id}}">Add to cart</a>
+                            </td>
+                            <td>
+                                <a class="gray_btn" href="/removewish/{{product[0].id}}">Remove</a>
                             </td>
                         </tr>
                         {% endfor %}
-                        <tr>
-                            <td>
-                                <h5>Total</h5>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                                <h5 style="margin-left:-175px">${{total}}</h5>
-                            </td>
-                        </tr>
                         <tr class="out_button_area">
                             <td>
                             </td>
                             <td>
+                            </td>
+                            <td>
                                 <div class="checkout_btn_inner d-flex align-items-center">
-                                    <a class="gray_btn" href="/home">Continue Shopping</a>
-                                    <a class="primary-btn" href="/home">Proceed to checkout</a>
+                                    <a style="margin-left:-45px" class="gray_btn" href="/home">Continue Shopping</a>
                                 </div>
                             </td>
                             <td>
@@ -71,7 +65,7 @@
 <section class="cart_area">
     <div class="container">
         <table class="table">
-        <label style="margin-left:130px;font-size:50px">This cart is empty! 
+        <label style="margin-left:130px;font-size:50px">This wishlist is empty! 
                                       Go <a style="color:red" href="/home">add</a> things to it!</label>
         </table>
     </div>
