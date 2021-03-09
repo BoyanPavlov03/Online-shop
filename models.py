@@ -74,8 +74,8 @@ class Rating(db.Model):
 class Address(db.Model):
     __tablename__ = 'address'
     id = db.Column(db.Integer, primary_key=True)
-    postal_code = db.Column(db.String(10), unique=True, nullable=False)
-    town = db.Column(db.String(80), unique=True, nullable=False)
-    street = db.Column(db.String(150), unique=True, nullable=False)
-    delivery = db.Column(db.String(80), unique=True, nullable=False)
+    postal_code = db.Column(db.String(10), unique=False, nullable=False)
+    town = db.Column(db.String(80), unique=False, nullable=False)
+    street = db.Column(db.String(150), unique=False, nullable=False)
+    delivery = db.Column(db.String(80), unique=False, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))

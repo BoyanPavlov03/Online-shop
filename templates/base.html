@@ -3,7 +3,6 @@
 <head>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" href="img/fav.png">
     <meta name="author" content="CodePixar">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -56,11 +55,12 @@
                     <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
                         <ul class="nav navbar-nav menu_nav ml-auto">
                             <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/wishlist">WishList</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/wishlist/{{current_user.id}}">WishList</a></li>
                             {% if not current_user.login_id %}
                             <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
                             {% else %}
+                            <li class="nav-item"><a class="nav-link" href="/myaddress/{{current_user.id}}">My Address</a></li>
                             <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                             {% endif %}
                             {% if current_user.is_administrator %}
@@ -68,15 +68,15 @@
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin Settings</a>
                                 <ul class="dropdown-menu">
                                     <li class="nav-item"><a class="nav-link" href="/newcategory">New Category</a></li>
-                                    {% if categories %}
                                     <li class="nav-item"><a class="nav-link" href="/newproduct">New Product</a></li>
-                                    {% endif %}
                                 </ul>
                             </li>
                             {% endif %}
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="nav-item"><a href="/cart" class="cart"><span class="ti-bag"></span></a></li>
+                            {% if current_user.login_id %}
+                            <li class="nav-item"><a href="/cart/{{current_user.id}}" class="cart"><span class="ti-bag"></span></a></li>
+                            {% endif %}
                             <li class="nav-item">
                                 <button class="search"><span class="lnr lnr-magnifier" id="search"></span></button>
                             </li>

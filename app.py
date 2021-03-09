@@ -37,7 +37,7 @@ def search():
     keyword = request.form.get('q')
     
     result = Product.query.msearch(keyword,fields=['name'])
-        
+    
     return render_template("index.html",products=result,categories = Category.query.all())
     
 @app.route('/addrating/<int:product_id>', methods=['GET','POST'])
@@ -48,8 +48,9 @@ def addrating(product_id):
         rating = float(rating)
         if rating > 5 or rating < 0:
             return redirect(url_for('product',product_id=product_id))
-            
-        if Rating.query.filter_by(user_id=current_user.id).first():
+        
+        checker = Rating.query.filter_by(user_id=current_user.id).filter_by(product_id=product_id).first()
+        if checker:
             return redirect(url_for('product',product_id=product_id))
         
         r = Rating(user_id=current_user.id,product_id=product_id,rating=rating)
@@ -78,7 +79,7 @@ def addcartfromwish(product_id):
     db.session.add(cart)
     db.session.commit()
     
-    return redirect(url_for('wishlist'))
+    return redirect(url_for('wishlist',user_id=current_user.id))
     
 @app.route('/addcartfromproduct/<int:product_id>', methods=['GET','POST'])
 @login_required
@@ -105,7 +106,7 @@ def removecart(product_id):
     db.session.delete(cart)
     db.session.commit()
 
-    return redirect(url_for('cart'))
+    return redirect(url_for('cart',user_id=current_user.id))
     
 @app.route('/addwish/<int:product_id>', methods=['GET','POST'])
 @login_required
@@ -123,7 +124,7 @@ def removewish(product_id):
     db.session.delete(wish)
     db.session.commit()
 
-    return redirect(url_for('wishlist'))
+    return redirect(url_for('wishlist',user_id=current_user.id))
     
 @app.route('/newcategory', methods=['GET', 'POST'])
 @login_required
@@ -190,18 +191,26 @@ def product(product_id):
     
     return render_template("product_details.html",product=product,category=category)
 
-@app.route('/cart')
-def cart():
-    result=db.session.query(Product,Cart).outerjoin(Product, Product.id == Cart.product_id).all()
+@app.route('/cart/<int:user_id>')
+@login_required
+def cart(user_id):
+    if user_id != current_user.id:
+        return redirect(url_for('home'))
+        
+    result=db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
     total = 0
     for r in result:
         total += r[0].price
     
     return render_template("cart.html",products=result,total=total)
     
-@app.route('/wishlist')
-def wishlist():
-    result=db.session.query(Product,Wish).outerjoin(Product, Product.id == Wish.product_id).all()
+@app.route('/wishlist/<int:user_id>')
+@login_required
+def wishlist(user_id):
+    if user_id != current_user.id:
+        return redirect(url_for('home'))
+        
+    result=db.session.query(Product,Wish).filter(Wish.user_id == current_user.id).outerjoin(Product, Product.id == Wish.product_id).all()
     
     return render_template("wishlist.html",products=result)
     
@@ -275,6 +284,31 @@ def login():
         return redirect(url_for('home'))
 
     return render_template('login.html')
+    
+@app.route('/myaddress/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def myaddress(user_id):
+    address_check = Address.query.filter_by(user_id=current_user.id).first()
+    if request.method == "POST":
+        town = request.form.get('town')
+        street = request.form.get('street')
+        delivery = request.form.get('delivery')
+        postal_code = request.form.get('postal_code')
+        
+        if not address_check:
+            address = Address(town=town,street=street,delivery=delivery,postal_code=postal_code,user_id=user_id)
+            db.session.add(address)
+        else:
+            address_check.town = town
+            address_check.street = street
+            address_check.delivery = delivery
+            address_check.postal_code = postal_code
+                
+        db.session.commit()
+
+        return redirect(url_for('home'))
+
+    return render_template("address.html",address=Address.query.filter_by(user_id=current_user.id).first())
     
 @app.route("/logout")
 @login_required
