@@ -8,7 +8,7 @@ source env/bin/activate
 
 For Windows:
 py -m venv env
-env/scripts/activate
+env\scripts\activate
 ```
 
 Install dependencies:
@@ -21,9 +21,11 @@ Execute:
 ```
 For Linux:
 export FLASK_APP=app.py
+export FLASK_ENV=development
 flask run
 
 For Windows:
 set FLASK_APP=app.py
+set FLASK_ENV=development
 flask run
 ```

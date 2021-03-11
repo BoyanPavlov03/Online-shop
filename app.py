@@ -59,9 +59,9 @@ def checkout(user_id):
     if request.method == 'POST':
         db.session.execute("delete from cart where user_id = "+ str(user_id) + ";")
         db.session.commit()
-        return redirect(url_for('home')
+        return redirect(url_for('home'))
         
-    return render_template("checkout.html",address=address,test=test)
+    return render_template("checkout.html", address=address, test=test)
         
 @app.route('/search', methods=['GET','POST'])
 def search():  
@@ -172,7 +172,7 @@ def newproduct():
             flash("This product exists!","danger")
             return redirect(url_for('newproduct'))
         
-        image = None
+        image = "static\img\p1.jpg"
         if 'image' in request.files and request.files['image']:
             upload = request.files['image']
             filename = secure_filename(upload.filename)

@@ -24,7 +24,7 @@
                     {% if current_user.login_id %}
                     <div class="card_area d-flex align-items-center">
                         <a class="primary-btn" onClick="addtocart({{product.id}})">Add to Cart</a>
-                        <a class="icon_btn" onClick="addtowish({{product.id}})"><i class="lnr lnr lnr-heart"></i></a>
+                        <a style="cursor:pointer" class="icon_btn" onClick="addtowish({{product.id}})"><i class="lnr lnr lnr-heart"></i></a>
                     </div>
                     {% endif %}
                 </div>
