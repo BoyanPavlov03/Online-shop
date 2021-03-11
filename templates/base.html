@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="../static/css/nouislider.min.css">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <link rel="stylesheet" href="../static/css/main.css">
-    <script src="../static/js/vendor/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="../static/js/vendor/bootstrap.min.js"></script>
     <script src="../static/js/jquery.ajaxchimp.min.js"></script>
@@ -33,12 +33,23 @@
     <script src="../static/js/main.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-23581568-13');
+    <script type=text/javascript>
+        function addtocart(a){
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/addcart",
+                data:{"product_id":a}
+            }).done(function(){console.log('success')})
+        }
+    </script>
+    <script type=text/javascript>
+        function addtowish(a){
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/addwish",
+                data:{"product_id":a}
+            }).done(function(){console.log('success')})
+        }
     </script>
     
     {% block head %}
@@ -55,11 +66,11 @@
                     <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
                         <ul class="nav navbar-nav menu_nav ml-auto">
                             <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/wishlist/{{current_user.id}}">WishList</a></li>
                             {% if not current_user.login_id %}
                             <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
                             {% else %}
+                            <li class="nav-item"><a class="nav-link" href="/wishlist/{{current_user.id}}">WishList</a></li>
                             <li class="nav-item"><a class="nav-link" href="/myaddress/{{current_user.id}}">My Address</a></li>
                             <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                             {% endif %}
@@ -85,7 +96,6 @@
                 </div>
             </nav>
         </div>
-        
         <div class="search_input" id="search_input_box">
             <div class="container">
                 <form class="d-flex justify-content-between" action='/search' method="POST">
@@ -99,5 +109,6 @@
     
     {% block content %}
     {% endblock %}
+
 </body>
 </html>

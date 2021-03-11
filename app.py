@@ -1,19 +1,24 @@
 from flask import Flask,request,session,url_for,redirect,render_template,make_response,flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user, logout_user
 import uuid
+import os
 
 from models import User, Product, Address, Category, Cart, Wish, Rating
 from login import login_manager
 from database import db
 from flask_msearch import Search
 
+uploads = os.path.join('static','img')
+
 app = Flask (__name__)
-app.config ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["WHOOSH_BASE"]='whoosh'
 app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
+app.config['UPLOAD_FOLDER'] = uploads
+
 secret_code = "admin1"
 
 db.init_app(app)
@@ -22,7 +27,15 @@ search.init_app(app)
 with app.app_context():
     db.create_all()
 
+app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
+app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+    '/uploads':  app.config['UPLOAD_FOLDER']
+})
+
 login_manager.init_app(app)
+
+def validate_file_type(filename, allowed_types):
+    return filename.split(".")[-1] in allowed_types
 
 @app.route('/')
 def index():
@@ -32,13 +45,30 @@ def index():
 def home():
     return render_template("index.html",categories = Category.query.all(),products = Product.query.all())
         
+@app.route('/checkout/<int:user_id>', methods=['GET','POST'])
+def checkout(user_id):
+    if user_id != current_user.id:
+        return redirect(url_for('home'))
+        
+    address = Address.query.filter_by(user_id=user_id).first()
+    test = 0
+    if address.town and address.street and address.postal_code and address.delivery:
+        test = 1
+
+    if request.method == 'POST':
+        db.session.execute("delete from cart where user_id = "+ str(user_id) + ";")
+        db.session.commit()
+        return redirect(url_for('cart',user_id=user_id))
+        
+    return render_template("checkout.html",address=address,test=test)
+        
 @app.route('/search', methods=['GET','POST'])
 def search():  
     keyword = request.form.get('q')
-    
+        
     result = Product.query.msearch(keyword,fields=['name'])
     
-    return render_template("index.html",products=result,categories = Category.query.all())
+    return render_template("index.html",products=result,categories = Category.query.all(),q=keyword)
     
 @app.route('/addrating/<int:product_id>', methods=['GET','POST'])
 @login_required
@@ -63,41 +93,15 @@ def addrating(product_id):
     return redirect(url_for('product',product_id=product_id))
     
 
-@app.route('/addcart/<int:product_id>', methods=['GET','POST'])
+@app.route('/addcart', methods=['GET','POST'])
 @login_required
-def addcart(product_id):
-    cart = Cart(user_id=current_user.id,product_id=product_id)
+def addcart():
+    data = request.form
+    cart = Cart(user_id=current_user.id,product_id=int(data['product_id']))
     db.session.add(cart)
     db.session.commit()
     
     return redirect(url_for('home'))
-    
-@app.route('/addcartfromwish/<int:product_id>', methods=['GET','POST'])
-@login_required
-def addcartfromwish(product_id):
-    cart = Cart(user_id=current_user.id,product_id=product_id)
-    db.session.add(cart)
-    db.session.commit()
-    
-    return redirect(url_for('wishlist',user_id=current_user.id))
-    
-@app.route('/addcartfromproduct/<int:product_id>', methods=['GET','POST'])
-@login_required
-def addcartfromproduct(product_id):
-    cart = Cart(user_id=current_user.id,product_id=product_id)
-    db.session.add(cart)
-    db.session.commit()
-    
-    return redirect(url_for('product',product_id=product_id))
-    
-@app.route('/addwishfromproduct/<int:product_id>', methods=['GET','POST'])
-@login_required
-def addwishfromproduct(product_id):
-    wish = Wish(user_id=current_user.id,product_id=product_id)
-    db.session.add(wish)
-    db.session.commit()
-    
-    return redirect(url_for('product',product_id=product_id))
     
 @app.route("/removecart/<int:product_id>", methods=['GET', 'POST'])
 @login_required
@@ -108,10 +112,11 @@ def removecart(product_id):
 
     return redirect(url_for('cart',user_id=current_user.id))
     
-@app.route('/addwish/<int:product_id>', methods=['GET','POST'])
+@app.route('/addwish', methods=['GET','POST'])
 @login_required
-def addwish(product_id):
-    wish = Wish(user_id=current_user.id,product_id=product_id)
+def addwish():
+    data = request.form
+    wish = Wish(user_id=current_user.id,product_id=int(data['product_id']))
     db.session.add(wish)
     db.session.commit()
     
@@ -161,17 +166,22 @@ def newproduct():
         description = request.form.get('description')
         price = request.form.get('price')
         category = request.form.get('category')
-        
         product_check = Product.query.filter_by(name=name).first()
         if product_check:
             flash("This product exists!","danger")
             return redirect(url_for('newproduct'))
-            
-        product = Product(name=name,short_description=short_description,description=description,price=price,rating=0,category_id=category)
+        
+        image = None
+        if 'image' in request.files and request.files['image']:
+            upload = request.files['image']
+            filename = secure_filename(upload.filename)
+            if validate_file_type(filename, ["jpeg", "jpg", "png"]):
+                upload.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image = f"{app.config['UPLOAD_FOLDER']}\{filename}"
     
+        product = Product(name=name,short_description=short_description,description=description,price=price,rating=0,category_id=category,img=image)
         db.session.add(product)
         db.session.commit()
-        
         return redirect(url_for('home'))
         
     return render_template('newproduct.html',categories = Category.query.all())

@@ -48,10 +48,11 @@ class Product(db.Model):
     short_description = db.Column(db.String(80), unique=False, nullable=False)
     description = db.Column(db.String(800), unique=False, nullable=False)
     price = db.Column(db.Float, unique=False, nullable=False)
+    img = db.Column(db.String(50), unique=True, nullable=False)
     rating =  db.Column(db.Float, unique=False, nullable=False)
     rating_count = db.Column(Integer, unique=False, nullable=True, default=0)
     category_id = db.Column(db.Integer, ForeignKey("category.id"))
-    
+
 class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)

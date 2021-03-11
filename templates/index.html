@@ -28,22 +28,24 @@
                     {% for product in products %}
                     <div class="col-lg-4 col-md-6">
                         <div class="single-product">
-                            <a href="/product/{{product.id}}"><img class="img-fluid" src="../static/img/p1.jpg" alt=""></a>
+                            <a href="/product/{{product.id}}"><img  style="width:555px;height:280px" class="img-fluid" src="..\{{product.img}}" alt="" onerror=this.src="../static/img/p1.jpg"></a>
                                 <div class="product-details">
                                 <h6>{{product.name}}</h6>
                                 <div class="price">
                                     <h6>${{product.price}}</h6>
                                 </div>
+                                {% if current_user.login_id %}
                                 <div class="prd-bottom">
-                                    <a href="/addcart/{{product.id}}" class="social-info">
+                                    <a style="cursor: pointer;" onClick="addtocart({{product.id}})" class="social-info">
                                         <span class="ti-bag"></span>
                                         <p class="hover-text">add to bag</p>
                                     </a>
-                                    <a href="/addwish/{{product.id}}" class="social-info">
+                                    <a style="cursor: pointer;" onClick="addtowish({{product.id}})" class="social-info">
                                         <span class="lnr lnr-heart"></span>
                                         <p class="hover-text">Wishlist</p>
                                     </a>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -53,5 +55,4 @@
         </div>
     </div>
 </div>
-    
 {% endblock %}

@@ -16,13 +16,13 @@
             </div>
             <div class="col-lg-6">
                 <div class="login_form_inner">
-                    <h3>Creating a product</h3>
+                    <h3 style="margin-top:-60px">Creating a product</h3>
                     {% with messages = get_flashed_messages() %}
                       {% if messages %}
                       <h3 style="color:red;margin-top:-80px">{{messages[0]}}</h3>
                       {% endif %}
                     {% endwith %}
-                    <form class="row login_form" action="/newproduct" method="POST">
+                    <form class="row login_form" action="/newproduct" method="POST" enctype="multipart/form-data">
                         <div class="col-md-12 form-group">
                             <input type="product" class="form-control" id="product" name="product" placeholder="Product name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Product name'" required>
                         </div>
@@ -41,6 +41,10 @@
                               <option value = "{{category.id}}">{{category.name}}</option>
                               {% endfor %}
                           </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label style="margin-left:-240px" for="image">Product image</label>
+                            <input type="file" class="form-control" id="image" name="image">
                         </div>
                         <div class="col-md-12 form-group">
                             <button type="submit" value="submit" class="primary-btn">Create</button>

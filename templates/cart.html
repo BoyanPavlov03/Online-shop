@@ -24,7 +24,7 @@
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img src="../static/img/cart.png" alt="">
+                                        <img style="width:150px;height:150px" src="../{{product[0].img}}" alt="">
                                     </div>
                                     <div class="media-body">
                                         <p>{{product[0].name}}</p>
@@ -55,7 +55,7 @@
                             <td>
                                 <div class="checkout_btn_inner d-flex align-items-center">
                                     <a class="gray_btn" href="/home">Continue Shopping</a>
-                                    <a class="primary-btn" href="/home">Proceed to checkout</a>
+                                    <a class="primary-btn" href="/checkout/{{current_user.id}}">Proceed to checkout</a>
                                 </div>
                             </td>
                             <td>

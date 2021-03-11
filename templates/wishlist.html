@@ -24,7 +24,7 @@
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img src="../static/img/cart.png" alt="">
+                                        <img style="width:150px;height:150px" src="../{{product[0].img}}" alt="">
                                     </div>
                                     <div class="media-body">
                                         <p>{{product[0].name}}</p>
@@ -35,7 +35,7 @@
                                 <h5>${{product[0].price}}</h5>
                             </td>
                             <td>
-                                <a style="margin-left:135px" class="gray_btn" href="/addcartfromwish/{{product[0].id}}">Add to cart</a>
+                                <button style="margin-left:135px;cursor:pointer" class="gray_btn" onClick="addtocart({{product[0].id}})">Add to cart</button>
                             </td>
                             <td>
                                 <a class="gray_btn" href="/removewish/{{product[0].id}}">Remove</a>
