@@ -52,13 +52,14 @@ def checkout(user_id):
         
     address = Address.query.filter_by(user_id=user_id).first()
     test = 0
-    if address.town and address.street and address.postal_code and address.delivery:
-        test = 1
+    if address:
+        if address.town and address.street and address.postal_code and address.delivery:
+            test = 1
 
     if request.method == 'POST':
         db.session.execute("delete from cart where user_id = "+ str(user_id) + ";")
         db.session.commit()
-        return redirect(url_for('cart',user_id=user_id))
+        return redirect(url_for('home')
         
     return render_template("checkout.html",address=address,test=test)
         
