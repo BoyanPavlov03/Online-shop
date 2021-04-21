@@ -1,4 +1,4 @@
-from flask import Flask,request,session,url_for,redirect,render_template,make_response,flash
+from flask import Flask,request,session,url_for,redirect,render_template,make_response,flash,json
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import secure_filename
@@ -6,7 +6,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 import uuid
 import os
 
-from models import User, Product, Address, Category, Cart, Wish, Rating
+from models import User, Product, Address, Category, Cart, Wish, Rating, PromoCode
 from login import login_manager
 from database import db
 from flask_msearch import Search
@@ -19,13 +19,16 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
 app.config['UPLOAD_FOLDER'] = uploads
 
-secret_code = "admin1"
-
 db.init_app(app)
 search = Search()
 search.init_app(app)
 with app.app_context():
     db.create_all()
+    admin = User(email="admin@gmail.com",username="admin",password=generate_password_hash("1234"),is_admin=1)
+    admin_check = User.query.filter_by(email=admin.email).first()
+    if not admin_check:
+        db.session.add(admin)
+        db.session.commit()
 
 app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
@@ -36,6 +39,42 @@ login_manager.init_app(app)
 
 def validate_file_type(filename, allowed_types):
     return filename.split(".")[-1] in allowed_types
+    
+@app.route('/admin_register', methods=['GET','POST'])
+def admin_register():
+    if current_user.id != 1:
+        return redirect(url_for('home'))
+        
+    if request.method == "POST":
+        email = request.form.get('email')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        user_check = User.query.filter_by(email=email).first()
+        if user_check:
+            flash("Email already exists! Sign in!","danger")
+            return redirect(url_for('admin_register'))
+        
+        user_check = User.query.filter_by(username=username).first()
+        if user_check:
+            flash("Username already exists! Sign in!","danger")
+            return redirect(url_for('admin_register'))
+            
+        if confirm_password != password:
+            flash("Passwords doesn't match","danger")
+            return redirect(url_for('admin_register'))
+
+        password = generate_password_hash(password)
+        
+        user = User(email=email,username=username,password=password,is_admin=1)
+        
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('home'))
+
+    return render_template("admin_register.html")
 
 @app.route('/')
 def index():
@@ -76,6 +115,8 @@ def search():
 def addrating(product_id):
     if request.method == 'POST':
         rating = request.form.get('rating')
+        comment = request.form.get('comment')
+        
         rating = float(rating)
         if rating > 5 or rating < 0:
             return redirect(url_for('product',product_id=product_id))
@@ -84,7 +125,7 @@ def addrating(product_id):
         if checker:
             return redirect(url_for('product',product_id=product_id))
         
-        r = Rating(user_id=current_user.id,product_id=product_id,rating=rating)
+        r = Rating(user_id=current_user.id,product_id=product_id,rating=rating,comment=comment)
         product = Product.query.filter_by(id=product_id).first()
         product.rating_count += 1
         
@@ -93,44 +134,124 @@ def addrating(product_id):
         
     return redirect(url_for('product',product_id=product_id))
     
-
+@app.route('/applypromocode', methods=['GET','POST'])
+def applypromocode():
+    data = request.form
+    name = data['name']
+    code = PromoCode.query.filter_by(name=name).first()
+    result = db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
+    quantity = Cart.query.filter_by(user_id=current_user.id).all()
+    
+    total = 0
+    i = 0
+    for r in result:
+        total += r[0].price * quantity[i].quantity
+        i += 1
+    
+    if not code:
+        return json.dumps(total)
+    
+    if total > 15:
+        if code.type == "percentage":
+            total = total - (total*code.value/100)
+        else:
+            total -= total
+        
+    total = round(total, 2)
+        
+    return json.dumps(total)
+    
 @app.route('/addcart', methods=['GET','POST'])
 @login_required
 def addcart():
     data = request.form
-    cart = Cart(user_id=current_user.id,product_id=int(data['product_id']))
-    db.session.add(cart)
-    db.session.commit()
+    product = Product.query.filter_by(id=int(data['product_id'])).first()
+    product_price = int(data['quantity'])*product.price
+    cart = Cart(user_id=current_user.id,product_id=int(data['product_id']),quantity=int(data['quantity']),price=product_price)
+    product = Cart.query.filter_by(product_id=cart.product_id).first()
+    if product:
+        product.quantity += cart.quantity
+        product.price += product_price
+        
+        db.session.commit()
+        return {}
+        
+    if cart.quantity != 0:    
+        db.session.add(cart)
+        db.session.commit()
+        
+    return {}
     
-    return redirect(url_for('home'))
-    
-@app.route("/removecart/<int:product_id>", methods=['GET', 'POST'])
+@app.route("/removecart", methods=['GET', 'POST'])
 @login_required
-def removecart(product_id):
-    cart = Cart.query.filter_by(product_id=product_id).first()
+def removecart():
+    data = request.form
+    cart = Cart.query.filter_by(product_id=int(data['product_id'])).first()
     db.session.delete(cart)
     db.session.commit()
 
-    return redirect(url_for('cart',user_id=current_user.id))
+    checker = 1
+
+    cart = Cart.query.all()
+    if not cart:
+        checker = 0
+
+    print(checker)
+
+    return {"index":int(data['product_id']),"checker":checker}
     
 @app.route('/addwish', methods=['GET','POST'])
 @login_required
 def addwish():
     data = request.form
     wish = Wish(user_id=current_user.id,product_id=int(data['product_id']))
-    db.session.add(wish)
-    db.session.commit()
+    product = Wish.query.filter_by(product_id=wish.product_id).first()
     
-    return redirect(url_for('home'))
+    if not product:
+        db.session.add(wish)
+        db.session.commit()
     
-@app.route("/removewish/<int:product_id>", methods=['GET', 'POST'])
+    return {}
+    
+@app.route("/removewish", methods=['GET', 'POST'])
 @login_required
 def removewish(product_id):
-    wish = Wish.query.filter_by(product_id=product_id).first()
+    data = request.form
+    wish = Wish.query.filter_by(product_id=int(data['product_id'])).first()
     db.session.delete(wish)
     db.session.commit()
 
-    return redirect(url_for('wishlist',user_id=current_user.id))
+    checker = 1
+
+    cart = Wish.query.all()
+    if not cart:
+        checker = 0
+
+    print(checker)
+
+    return {"index":int(data['product_id']),"checker":checker}
+    
+@app.route('/promocode', methods=['GET', 'POST'])
+@login_required
+def promocode():
+    if current_user.is_administrator == False:
+        return redirect(url_for('home'))
+        
+    if request.method == 'POST':
+        name = request.form.get('name')
+        type = request.form.get('type')
+        amount = request.form.get('amount')
+        code_check = PromoCode.query.filter_by(name=name).first()
+        if code_check:
+            flash("This code exists!","danger")
+            return redirect(url_for('promocode'))
+        
+        promocode = PromoCode(name=name,type=type,value=amount)
+        db.session.add(promocode)
+        db.session.commit()
+        return redirect(url_for('home'))
+        
+    return render_template('promocode.html')
     
 @app.route('/newcategory', methods=['GET', 'POST'])
 @login_required
@@ -199,8 +320,22 @@ def product(product_id):
     
     if product.rating_count != 0:
         product.rating = total / product.rating_count
+        
+    total = 0
     
-    return render_template("product_details.html",product=product,category=category)
+    users = []
+    comments = []
+    rating = []
+    
+    ratings=db.engine.execute("select User.username, Rating.rating, Rating.comment from Rating left join User on Rating.user_id = User.id")
+    for r in ratings:
+        rating.append(r[1])
+        users.append(r[0])
+        comments.append(r[2])
+        total += 1
+         
+    
+    return render_template("product_details.html",product=product,category=category,ratings=rating,users=users,comments=comments,total=total)
 
 @app.route('/cart/<int:user_id>')
 @login_required
@@ -208,12 +343,18 @@ def cart(user_id):
     if user_id != current_user.id:
         return redirect(url_for('home'))
         
-    result=db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
-    total = 0
-    for r in result:
-        total += r[0].price
+    result = db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
+    quantity = Cart.query.filter_by(user_id=current_user.id).all()
     
-    return render_template("cart.html",products=result,total=total)
+    total = 0
+    i = 0
+    for r in result:
+        total += r[0].price * quantity[i].quantity
+        i += 1
+        
+    print(total)
+    
+    return render_template("cart.html",products=result,total=total,quantity=quantity)
     
 @app.route('/wishlist/<int:user_id>')
 @login_required
@@ -241,7 +382,6 @@ def register():
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
-        special_code = request.form.get('administrator_code')
         confirm_password = request.form.get('confirm_password')
         
         user_check = User.query.filter_by(email=email).first()
@@ -259,11 +399,8 @@ def register():
             return redirect(url_for('register'))
 
         password = generate_password_hash(password)
-
-        if special_code == secret_code:
-            user = User(email=email, username=username, password=password, special_code=special_code)
-        else:    
-            user = User(email=email, username=username, password=password)
+        
+        user = User(email=email,username=username,password=password)
         
         db.session.add(user)
         db.session.commit()

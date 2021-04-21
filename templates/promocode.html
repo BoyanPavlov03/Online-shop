@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %} New Promo Code {% endblock %}
+
+{% block content %}
+<section class="banner-area organic-breadcrumb">
+</section>
+
+<section class="login_box_area section_gap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login_box_img">
+                    <img class="img-fluid" src="../static/img/login.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="login_form_inner">
+                    <h3 style="margin-top:-60px">Creating a promo code</h3>
+                    <form class="row login_form" action="/promocode" method="POST" enctype="multipart/form-data">
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Promo code name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Promo code name'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="number" class="form-control" id="amount" name="amount" placeholder="Amount" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Amount'" min="1" max="15" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <select style="margin-left:55px" type="type" name="type" id = "myList">
+                                <option value = "percentage">Percentage</option>
+                                <option value = "amount">Amount</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="primary-btn">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

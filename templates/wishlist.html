@@ -7,7 +7,7 @@
 </section>
 
 {% if products %}
-<section class="cart_area">
+<section id="wish" class="cart_area">
     <div class="container">
         <div class="cart_inner">
             <div class="table-responsive">
@@ -16,29 +16,39 @@
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for product in products %}
-                        <tr>
+                    {% for i in range(products | length) %}
+                        <tr id="row{{i + 1}}">
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img style="width:150px;height:150px" src="../{{product[0].img}}" alt="">
+                                        <img style="width:150px;height:150px" src="../{{products[i][0].img}}" alt="">
                                     </div>
                                     <div class="media-body">
-                                        <p>{{product[0].name}}</p>
+                                        <p>{{products[i][0].name}}</p>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <h5>${{product[0].price}}</h5>
+                                <h5>${{products[i][0].price}}</h5>
                             </td>
                             <td>
-                                <button style="margin-left:135px;cursor:pointer" class="gray_btn" onClick="addtocart({{product[0].id}})">Add to cart</button>
+                                <div class="product_count">
+                                    <input type="text" name="quantity" id="quantity" maxlength="12" value="1" title="Quantity:" class="input-text qty">
+                                    <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
+                                    <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                                </div>
                             </td>
                             <td>
-                                <a class="gray_btn" href="/removewish/{{product[0].id}}">Remove</a>
+                                <button style="cursor:pointer" class="gray_btn" onClick="addtocart({{products[i][0].id}})">Add to cart</button>
+                            </td>
+                            <td>
+                                <button class="gray_btn" style="cursor:pointer" onClick="removecart({{i + 1}})">Remove</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -51,6 +61,8 @@
                                 <div class="checkout_btn_inner d-flex align-items-center">
                                     <a style="margin-left:-45px" class="gray_btn" href="/home">Continue Shopping</a>
                                 </div>
+                            </td>
+                            <td>
                             </td>
                             <td>
                             </td>

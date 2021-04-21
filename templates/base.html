@@ -38,8 +38,11 @@
             $.ajax({
                 type:"POST",
                 url:"http://localhost:5000/addcart",
-                data:{"product_id":a}
-            }).done(function(){console.log('success')})
+                data:{"product_id":a,"quantity":($("#quantity").length ? $("#quantity").val() : 1)}
+            }).done(function(){console.log('success');
+            if ($("#quantity").length){
+                $("#quantity").val(1)
+            } })
         }
     </script>
     <script type=text/javascript>
@@ -51,7 +54,52 @@
             }).done(function(){console.log('success')})
         }
     </script>
-    
+    <script>
+        function applypromocode(){
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/applypromocode",
+                data:{"name":$("#code").val()},
+                success: function(response){
+                    document.getElementById("total").innerHTML = "$".concat(response.toString(10));
+                }
+            }).done(function(){console.log('success');
+            if ($("#code").length){
+                $("#code").val("")
+            } })
+        }
+    </script>
+    <script type=text/javascript>
+        function removecart(a){
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/removecart",
+                data:{"product_id":a},
+                success: function(response) {
+                    document.getElementById("row".concat(response['index'])).remove();
+                    if (response['checker'] == 0){
+                        document.getElementById("cart").remove();
+                    }
+                }
+            }).done(function(){console.log('success');})
+        }
+    </script>
+    <script type=text/javascript>
+        function removewish(a){
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/removewish",
+                data:{"product_id":a},
+                success: function(response) {
+                    document.getElementById("row".concat(response['index'])).remove();
+                    if (response['checker'] == 0){
+                        document.getElementById("wish").remove();
+                    }
+                    
+                }
+            }).done(function(){console.log('success');})
+        }
+    </script>
     {% block head %}
     {% endblock %}
 </head>
@@ -80,6 +128,10 @@
                                 <ul class="dropdown-menu">
                                     <li class="nav-item"><a class="nav-link" href="/newcategory">New Category</a></li>
                                     <li class="nav-item"><a class="nav-link" href="/newproduct">New Product</a></li>
+                                    {% if current_user.id == 1 %}
+                                    <li class="nav-item"><a class="nav-link" href="/admin_register">Register an admin</a></li>
+                                    {% endif %}
+                                    <li class="nav-item"><a class="nav-link" href="/promocode">Create a promo code</a></li>
                                 </ul>
                             </li>
                             {% endif %}

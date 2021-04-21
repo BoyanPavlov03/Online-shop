@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Admin Register {% endblock %}
+
+{% block content %}
+<section class="banner-area organic-breadcrumb">
+</section>
+
+
+<section class="login_box_area section_gap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login_form_inner">
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                      <h3 style="color:red;margin-top:-40px">{{messages[0]}}</h3>
+                      {% endif %}
+                    {% endwith %}
+                    <h3>Register an admin</h3>
+                    <form class="row login_form" action="/admin_register" method="POST">
+                        <div class="col-md-12 form-group">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="username" class="form-control" id="username" name="username" placeholder="Username" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Username'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Confirm Password" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="primary-btn">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="login_box_img">
+                    <img class="img-fluid" src="../static/img/login.jpg" alt="">
+                    <div class="hover">
+                        <h4>REGISTER AN ADMIN</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

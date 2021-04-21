@@ -19,16 +19,16 @@
                     <h3>My Address</h3>
                     <form class="row login_form" action="/myaddress/{{current_user.id}}" method="POST">
                         <div class="col-md-12 form-group">
-                            <textarea style="height:38px" type="text" class="form-control" id="town" name="town" placeholder="Town" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Town'">{{address.town}}</textarea>
+                            <textarea style="height:38px" type="text" class="form-control" id="town" name="town" placeholder="Town" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Town'" required>{{address.town}}</textarea>
                         </div>
                         <div class="col-md-12 form-group">
-                            <textarea style="height:38px" class="form-control" id="street" name="street" placeholder="Street" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Street'">{{address.street}}</textarea>
+                            <textarea style="height:38px" class="form-control" id="street" name="street" placeholder="Street" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Street'" required>{{address.street}}</textarea>
                         </div>
                         <div class="col-md-12 form-group">
-                            <textarea style="height:38px" class="form-control" id="postal_code" name="postal_code" placeholder="Postal Code" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Postal Code'">{{address.postal_code}}</textarea>
+                            <textarea style="height:38px" class="form-control" id="postal_code" name="postal_code" placeholder="Postal Code" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Postal Code'" required>{{address.postal_code}}</textarea>
                         </div>
                         <div class="col-md-12 form-group">
-                            <textarea style="height:38px" class="form-control" id="delivery" name="delivery" placeholder="Delivery" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Delivery'">{{address.delivery}}</textarea>
+                            <textarea style="height:38px" class="form-control" id="delivery" name="delivery" placeholder="Delivery" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Delivery'" required>{{address.delivery}}</textarea>
                         </div>
                         <div class="col-md-12 form-group">
                             <button type="submit" value="submit" class="primary-btn">Save</button>

@@ -9,11 +9,11 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=True, nullable=False)
     login_id = db.Column(db.String(36), nullable=True)
-    special_code = db.Column(db.String(6), nullable=True)
+    is_admin = db.Column(db.Integer, default=0, unique=False)
 
     @property
     def is_administrator(self):
-        if self.special_code:
+        if self.is_admin:
             return True
         return False
 
@@ -34,11 +34,18 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username    
-
+        
+class PromoCode(db.Model):
+    __tablename__ = 'promocode'
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    type = db.Column(db.String(50), unique=False, nullable=False)
+    value = db.Column(db.Integer, unique=False, nullable=False)
+    
 class Category(db.Model):
     __tablename__ = 'category'
-    id = db.Column(Integer, primary_key=True)
-    name = db.Column(String(50), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
 
 class Product(db.Model):
     __tablename__ = 'product'
@@ -48,7 +55,7 @@ class Product(db.Model):
     short_description = db.Column(db.String(80), unique=False, nullable=False)
     description = db.Column(db.String(800), unique=False, nullable=False)
     price = db.Column(db.Float, unique=False, nullable=False)
-    img = db.Column(db.String(50), unique=True, nullable=False)
+    img = db.Column(db.String(50), unique=False, nullable=False)
     rating =  db.Column(db.Float, unique=False, nullable=False)
     rating_count = db.Column(Integer, unique=False, nullable=True, default=0)
     category_id = db.Column(db.Integer, ForeignKey("category.id"))
@@ -56,6 +63,8 @@ class Product(db.Model):
 class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Integer, unique=False, default=1)
+    price = db.Column(db.Float, unique=False, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
     
@@ -70,6 +79,7 @@ class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
+    comment = db.Column(db.String(300), unique=False, nullable=False)
     rating =  db.Column(db.Integer, unique=False, nullable=False)
     
 class Address(db.Model):

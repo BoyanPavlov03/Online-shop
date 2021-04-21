@@ -7,35 +7,44 @@
 </section>
 
 {% if products %}
-<section class="cart_area">
+<section id="cart" class="cart_area">
     <div class="container">
         <div class="cart_inner">
             <div class="table-responsive">
-                <table class="table">
+                <table id="table" class="table">
                     <thead>
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total Price</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for product in products %}
-                        <tr>
+                        {% for i in range(products | length) %}
+                        <tr id="row{{i + 1}}">
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img style="width:150px;height:150px" src="../{{product[0].img}}" alt="">
+                                        <img style="width:150px;height:150px" src="../{{products[i][0].img}}" alt="">
                                     </div>
                                     <div class="media-body">
-                                        <p>{{product[0].name}}</p>
+                                        <p>{{products[i][0].name}}</p>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <h5>${{product[0].price}}</h5>
+                                <h5>${{products[i][0].price}}</h5>
                             </td>
                             <td>
-                                <a class="gray_btn" href="/removecart/{{product[0].id}}">Remove</a>
+                                <h5>{{quantity[i].quantity}}</h5>
+                            </td>
+                            <td>
+                                <h5>${{quantity[i].price}}</h5>
+                            </td>
+                            <td>
+                                <button class="gray_btn remove-row" style="cursor:pointer" onClick="removecart({{i + 1}})">Remove</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -46,7 +55,27 @@
                             <td>
                             </td>
                             <td>
-                                <h5 style="margin-left:-175px">${{total}}</h5>
+                            </td>
+                            <td>
+                                <h5 id="total">${{total}}</h5>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr class="bottom_button">
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <div class="cupon_text d-flex align-items-center">
+                                    <input type="text" name="code" id="code" placeholder="Coupon Code">
+                                    <a class="primary-btn" onClick="applypromocode({{current_user.id}})">Apply</a>
+                                </div>
                             </td>
                         </tr>
                         <tr class="out_button_area">
@@ -57,6 +86,10 @@
                                     <a class="gray_btn" href="/home">Continue Shopping</a>
                                     <a class="primary-btn" href="/checkout/{{current_user.id}}">Proceed to checkout</a>
                                 </div>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
                             </td>
                             <td>
                             </td>
