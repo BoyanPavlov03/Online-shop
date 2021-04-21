@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Cart {% endblock %}
+{% block title %} WishList {% endblock %}
 
 {% block content %}
 <section class="banner-area organic-breadcrumb">
@@ -23,7 +23,7 @@
                     </thead>
                     <tbody>
                     {% for i in range(products | length) %}
-                        <tr id="row{{i + 1}}">
+                        <tr id="row{{products[i][0].id}}">
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
@@ -39,16 +39,16 @@
                             </td>
                             <td>
                                 <div class="product_count">
-                                    <input type="text" name="quantity" id="quantity" maxlength="12" value="1" title="Quantity:" class="input-text qty">
-                                    <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
-                                    <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                                    <input type="text" name="quantity" id="quantity{{products[i][0].id}}" maxlength="12" value="1" title="Quantity:" class="input-text qty">
+                                    <button onclick="var result = document.getElementById('quantity{{products[i][0].id}}'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
+                                    <button onclick="var result = document.getElementById('quantity{{products[i][0].id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
                                 </div>
                             </td>
                             <td>
                                 <button style="cursor:pointer" class="gray_btn" onClick="addtocart({{products[i][0].id}})">Add to cart</button>
                             </td>
                             <td>
-                                <button class="gray_btn" style="cursor:pointer" onClick="removecart({{i + 1}})">Remove</button>
+                                <button class="gray_btn" style="cursor:pointer" onClick="removewish({{products[i][0].id}})">Remove</button>
                             </td>
                         </tr>
                         {% endfor %}

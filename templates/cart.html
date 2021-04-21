@@ -23,7 +23,7 @@
                     </thead>
                     <tbody>
                         {% for i in range(products | length) %}
-                        <tr id="row{{i + 1}}">
+                        <tr id="row{{products[i][0].id}}">
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
@@ -44,7 +44,7 @@
                                 <h5>${{quantity[i].price}}</h5>
                             </td>
                             <td>
-                                <button class="gray_btn remove-row" style="cursor:pointer" onClick="removecart({{i + 1}})">Remove</button>
+                                <button class="gray_btn" style="cursor:pointer" onClick="removecart({{products[i][0].id}})">Remove</button>
                             </td>
                         </tr>
                         {% endfor %}

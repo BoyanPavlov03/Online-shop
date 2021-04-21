@@ -5,11 +5,14 @@ from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user, logout_user
 import uuid
 import os
+from sqlalchemy import text
+
 
 from models import User, Product, Address, Category, Cart, Wish, Rating, PromoCode
 from login import login_manager
 from database import db
 from flask_msearch import Search
+from recommendations import sim_pearson,topMatches,transformPrefs
 
 uploads = os.path.join('static','img')
 
@@ -36,6 +39,18 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 })
 
 login_manager.init_app(app)
+
+def get_total_price():
+    result = db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
+    quantity = Cart.query.filter_by(user_id=current_user.id).all()
+    
+    total = 0
+    i = 0
+    for r in result:
+        total += r[0].price * quantity[i].quantity
+        i += 1
+    
+    return total
 
 def validate_file_type(filename, allowed_types):
     return filename.split(".")[-1] in allowed_types
@@ -139,14 +154,7 @@ def applypromocode():
     data = request.form
     name = data['name']
     code = PromoCode.query.filter_by(name=name).first()
-    result = db.session.query(Product,Cart).filter(Cart.user_id == current_user.id).outerjoin(Product, Product.id == Cart.product_id).all()
-    quantity = Cart.query.filter_by(user_id=current_user.id).all()
-    
-    total = 0
-    i = 0
-    for r in result:
-        total += r[0].price * quantity[i].quantity
-        i += 1
+    total = get_total_price()
     
     if not code:
         return json.dumps(total)
@@ -155,7 +163,7 @@ def applypromocode():
         if code.type == "percentage":
             total = total - (total*code.value/100)
         else:
-            total -= total
+            total -= code.value
         
     total = round(total, 2)
         
@@ -165,6 +173,7 @@ def applypromocode():
 @login_required
 def addcart():
     data = request.form
+    print(data)
     product = Product.query.filter_by(id=int(data['product_id'])).first()
     product_price = int(data['quantity'])*product.price
     cart = Cart(user_id=current_user.id,product_id=int(data['product_id']),quantity=int(data['quantity']),price=product_price)
@@ -186,9 +195,12 @@ def addcart():
 @login_required
 def removecart():
     data = request.form
+    print(data)
     cart = Cart.query.filter_by(product_id=int(data['product_id'])).first()
     db.session.delete(cart)
     db.session.commit()
+
+    total = get_total_price()
 
     checker = 1
 
@@ -196,9 +208,7 @@ def removecart():
     if not cart:
         checker = 0
 
-    print(checker)
-
-    return {"index":int(data['product_id']),"checker":checker}
+    return {"index":int(data['product_id']),"checker":checker,"total":total}
     
 @app.route('/addwish', methods=['GET','POST'])
 @login_required
@@ -215,8 +225,9 @@ def addwish():
     
 @app.route("/removewish", methods=['GET', 'POST'])
 @login_required
-def removewish(product_id):
+def removewish():
     data = request.form
+    print(data)
     wish = Wish.query.filter_by(product_id=int(data['product_id'])).first()
     db.session.delete(wish)
     db.session.commit()
@@ -226,8 +237,6 @@ def removewish(product_id):
     cart = Wish.query.all()
     if not cart:
         checker = 0
-
-    print(checker)
 
     return {"index":int(data['product_id']),"checker":checker}
     
@@ -321,21 +330,42 @@ def product(product_id):
     if product.rating_count != 0:
         product.rating = total / product.rating_count
         
+    product.rating = round(product.rating, 2)
+        
     total = 0
     
     users = []
     comments = []
     rating = []
     
-    ratings=db.engine.execute("select User.username, Rating.rating, Rating.comment from Rating left join User on Rating.user_id = User.id")
+    print(product.rating)
+    
+    ratings = db.engine.execute(text("select User.username, Rating.rating, Rating.comment from Rating left join User on Rating.user_id = User.id where Rating.product_id = " + str(product_id)))
     for r in ratings:
         rating.append(r[1])
         users.append(r[0])
         comments.append(r[2])
         total += 1
-         
     
-    return render_template("product_details.html",product=product,category=category,ratings=rating,users=users,comments=comments,total=total)
+    ratings = Rating.query.all()     
+    recommended_products = {}
+    
+    for i in range(len(ratings)):
+        user = User.query.filter_by(id=ratings[i].user_id).first()
+        product_check = Product.query.filter_by(id=ratings[i].product_id).first()
+        
+        if user.username not in recommended_products.keys():
+            recommended_products[user.username] = {}
+        
+        if product_check.name not in recommended_products[user.username].keys():
+            recommended_products[user.username][product_check.name] = ratings[i].rating
+            
+    recommended_products = transformPrefs(recommended_products)
+    recommended_products = topMatches(recommended_products,product.name,3)
+    
+    product_list = [Product.query.filter_by(name=product[1]).first() for product in recommended_products]
+    
+    return render_template("product_details.html",recommended_products=product_list,product=product,category=category,ratings=rating,users=users,comments=comments,total=total)
 
 @app.route('/cart/<int:user_id>')
 @login_required
@@ -351,8 +381,6 @@ def cart(user_id):
     for r in result:
         total += r[0].price * quantity[i].quantity
         i += 1
-        
-    print(total)
     
     return render_template("cart.html",products=result,total=total,quantity=quantity)
     

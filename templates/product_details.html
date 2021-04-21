@@ -23,9 +23,9 @@
                     <p>{{product.short_description}}</p>
                     <div class="product_count">
                         <label for="quantity">Quantity:</label>
-                        <input type="text" name="quantity" id="quantity" maxlength="12" value="1" title="Quantity:" class="input-text qty">
-                        <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
-                        <button onclick="var result = document.getElementById('quantity'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                        <input type="text" name="quantity" id="quantity{{product.id}}" maxlength="12" value="1" title="Quantity:" class="input-text qty">
+                        <button onclick="var result = document.getElementById('quantity{{product.id}}'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
+                        <button onclick="var result = document.getElementById('quantity{{product.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
                     </div>
                     {% if current_user.login_id %}
                     <div class="card_area d-flex align-items-center">
@@ -72,9 +72,7 @@
                                 <div class="media">
                                     <div class="media-body">
                                         <h4>{{users[i]}}</h4>
-                                        {% for j in range(ratings[i]) %}
-                                        <i class="fa fa-star"></i>
-                                        {% endfor %}
+                                        <i>(Rated with {{ratings[i]}})</i>
                                     </div>
                                 </div>
                                 <p>{{comments[i]}}</p>
@@ -87,18 +85,18 @@
                         <div class="review_box">
                             <h4>Add a Review</h4>
                             <p>Your Rating(0-5):</p>
-                            <form class="row contact_form" action="/addrating/{{product.id}}" method="post" id="contactForm" novalidate="novalidate">
+                            <form class="row contact_form" action="/addrating/{{product.id}}" method="post" id="contactForm">
                                 <div class="col-md-12">
-                                    <div class="form-group">
-                                        <textarea type="text" class="form-control" id="comment" name="comment" placeholder="Your comment" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your comment'"></textarea>
+                                    <div class="form-group form-group">
+                                        <textarea type="text" class="form-control" id="comment" name="comment" placeholder="Your comment" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your comment'" required></textarea>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-12 form-group">
                                     <div class="form-group">
-                                        <input type="number" class="form-control" id="rating" name="rating" placeholder="Your rating" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your rating'">
+                                        <input type="number" class="form-control" id="rating" name="rating" placeholder="Your rating" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your rating'" step="0.01" required>
                                     </div>
                                 </div>
-                                <div class="col-md-12 text-right">
+                                <div class="col-md-12 form-group">
                                     <button type="submit" value="submit" class="primary-btn">Submit Now</button>
                                 </div>
                             </form>
@@ -110,6 +108,43 @@
         </div>
     </div>
 </section>
+
+<div style="margin-top:-120px" class="filter-bar d-flex flex-wrap align-items-center"></div>
+
+<div style="margin-left:475px" class="col-xl-6 col-lg-8 col-md-7">
+        
+    
+            
+    <section class="lattest-product-area pb-40 category-list">
+        <div class="row">
+            {% for product in recommended_products %}
+            <div class="col-lg-4 col-md-6">
+                <div class="single-product">
+                    <a href="/product/{{product.id}}"><img  style="width:555px;height:280px" class="img-fluid" src="..\{{product.img}}" alt="" onerror=this.src="../static/img/p1.jpg"></a>
+                        <div class="product-details">
+                        <h6>{{product.name}}</h6>
+                        <div class="price">
+                            <h6>${{product.price}}</h6>
+                        </div>
+                        {% if current_user.login_id %}
+                        <div class="prd-bottom">
+                            <a style="cursor: pointer;" onClick="addtocart({{product.id}})" class="social-info">
+                                <span class="ti-bag"></span>
+                                <p class="hover-text">add to bag</p>
+                            </a>
+                            <a style="cursor: pointer;" onClick="addtowish({{product.id}})" class="social-info">
+                                <span class="lnr lnr-heart"></span>
+                                <p class="hover-text">Wishlist</p>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
 
 
 {% endblock %}
