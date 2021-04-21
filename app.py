@@ -177,7 +177,7 @@ def addcart():
     product = Product.query.filter_by(id=int(data['product_id'])).first()
     product_price = int(data['quantity'])*product.price
     cart = Cart(user_id=current_user.id,product_id=int(data['product_id']),quantity=int(data['quantity']),price=product_price)
-    product = Cart.query.filter_by(product_id=cart.product_id).first()
+    product = Cart.query.filter_by(product_id=cart.product_id, user_id=current_user.id).first()
     if product:
         product.quantity += cart.quantity
         product.price += product_price
@@ -196,7 +196,7 @@ def addcart():
 def removecart():
     data = request.form
     print(data)
-    cart = Cart.query.filter_by(product_id=int(data['product_id'])).first()
+    cart = Cart.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
     db.session.delete(cart)
     db.session.commit()
 
@@ -204,9 +204,10 @@ def removecart():
 
     checker = 1
 
-    cart = Cart.query.all()
+    cart = Cart.query.filter_by(user_id=current_user.id).all()
     if not cart:
         checker = 0
+    print(checker)
 
     return {"index":int(data['product_id']),"checker":checker,"total":total}
     
@@ -215,7 +216,7 @@ def removecart():
 def addwish():
     data = request.form
     wish = Wish(user_id=current_user.id,product_id=int(data['product_id']))
-    product = Wish.query.filter_by(product_id=wish.product_id).first()
+    product = Wish.query.filter_by(product_id=wish.product_id, user_id = current_user.id).first()
     
     if not product:
         db.session.add(wish)
@@ -228,15 +229,16 @@ def addwish():
 def removewish():
     data = request.form
     print(data)
-    wish = Wish.query.filter_by(product_id=int(data['product_id'])).first()
+    wish = Wish.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
     db.session.delete(wish)
     db.session.commit()
 
     checker = 1
 
-    cart = Wish.query.all()
+    cart = Wish.query.filter_by(user_id=current_user.id).all()
     if not cart:
         checker = 0
+    print(checker)
 
     return {"index":int(data['product_id']),"checker":checker}
     
@@ -361,9 +363,11 @@ def product(product_id):
             recommended_products[user.username][product_check.name] = ratings[i].rating
             
     recommended_products = transformPrefs(recommended_products)
-    recommended_products = topMatches(recommended_products,product.name,3)
-    
-    product_list = [Product.query.filter_by(name=product[1]).first() for product in recommended_products]
+    if product.name not in recommended_products:
+        product_list = []
+    else:
+        recommended_products = topMatches(recommended_products,product.name,3)
+        product_list = [Product.query.filter_by(name=product[1]).first() for product in recommended_products]
     
     return render_template("product_details.html",recommended_products=product_list,product=product,category=category,ratings=rating,users=users,comments=comments,total=total)
 
