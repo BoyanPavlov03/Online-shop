@@ -4,6 +4,13 @@
 
 {% block content %}
 <section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+            <div class="col-first">
+                <h1>{{product.name}}</h1>
+            </div>
+        </div>
+    </div>
 </section>
 
 <div class="product_image_area">
@@ -88,7 +95,7 @@
                             <form class="row contact_form" action="/addrating/{{product.id}}" method="post" id="contactForm">
                                 <div class="col-md-12">
                                     <div class="form-group form-group">
-                                        <textarea type="text" class="form-control" id="comment" name="comment" placeholder="Your comment" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your comment'" required></textarea>
+                                        <textarea type="text" class="form-control" id="comment" name="comment" placeholder="Your comment" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your comment'"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-12 form-group">

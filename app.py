@@ -176,6 +176,9 @@ def addcart():
     product = Product.query.filter_by(id=int(data['product_id'])).first()
     product_price = int(data['quantity'])*product.price
     cart = Cart(user_id=current_user.id,product_id=int(data['product_id']),quantity=int(data['quantity']),price=product_price)
+    if cart.quantity < 0:
+        return {}
+    
     product = Cart.query.filter_by(product_id=cart.product_id, user_id=current_user.id).first()
     if product:
         product.quantity += cart.quantity

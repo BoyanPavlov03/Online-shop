@@ -8,10 +8,6 @@
         <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
             <div class="col-first">
                 <h1>Shopping Cart</h1>
-                <nav class="d-flex align-items-center">
-                    <a href="index.html">Home<span class="lnr lnr-arrow-right"></span></a>
-                    <a href="category.html">Cart</a>
-                </nav>
             </div>
         </div>
     </div>
@@ -39,7 +35,7 @@
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img style="width:150px;height:150px" src="../{{products[i][0].img}}" alt="">
+                                        <a href="/product/{{products[i][0].id}}"><img style="width:150px;height:150px" src="../{{products[i][0].img}}" alt=""></a>
                                     </div>
                                     <div class="media-body">
                                         <p>{{products[i][0].name}}</p>
