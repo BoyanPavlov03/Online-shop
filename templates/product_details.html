@@ -21,13 +21,13 @@
                     </ul>
                     <ul class="list"></ul>
                     <p>{{product.short_description}}</p>
+                    {% if current_user.login_id %}
                     <div class="product_count">
                         <label for="quantity">Quantity:</label>
                         <input type="text" name="quantity" id="quantity{{product.id}}" maxlength="12" value="1" title="Quantity:" class="input-text qty">
                         <button onclick="var result = document.getElementById('quantity{{product.id}}'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
                         <button onclick="var result = document.getElementById('quantity{{product.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
                     </div>
-                    {% if current_user.login_id %}
                     <div class="card_area d-flex align-items-center">
                         <a class="primary-btn" onClick="addtocart({{product.id}})">Add to Cart</a>
                         <a style="cursor:pointer" class="icon_btn" onClick="addtowish({{product.id}})"><i class="lnr lnr lnr-heart"></i></a>
@@ -111,17 +111,15 @@
 
 <div style="margin-top:-120px" class="filter-bar d-flex flex-wrap align-items-center"></div>
 
-<div style="margin-left:475px" class="col-xl-6 col-lg-8 col-md-7">
-        
-    
-            
+<div style="margin-left:310px" class="col-xl-8 col-lg-8 col-md-7">
+                
     <section class="lattest-product-area pb-40 category-list">
         <div class="row">
             {% for product in recommended_products %}
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-3 col-md-6">
                 <div class="single-product">
                     <a href="/product/{{product.id}}"><img  style="width:555px;height:280px" class="img-fluid" src="..\{{product.img}}" alt="" onerror=this.src="../static/img/p1.jpg"></a>
-                        <div class="product-details">
+                        <div class="product-details" >
                         <h6>{{product.name}}</h6>
                         <div class="price">
                             <h6>${{product.price}}</h6>

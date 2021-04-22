@@ -4,7 +4,15 @@
 
 {% block content %}
 <section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+            <div class="col-first">
+                <h1>{{category.name}}</h1>
+            </div>
+        </div>
+    </div>
 </section>
+
 
 <div class="container">
     <div class="row">
@@ -22,7 +30,6 @@
         <div class="col-xl-9 col-lg-8 col-md-7">
                 
             <div class="filter-bar d-flex flex-wrap align-items-center">
-                <h6 style="margin-top:18px">{{category.name}}<h6>
             </div>
                     
             <section class="lattest-product-area pb-40 category-list">

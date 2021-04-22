@@ -173,7 +173,6 @@ def applypromocode():
 @login_required
 def addcart():
     data = request.form
-    print(data)
     product = Product.query.filter_by(id=int(data['product_id'])).first()
     product_price = int(data['quantity'])*product.price
     cart = Cart(user_id=current_user.id,product_id=int(data['product_id']),quantity=int(data['quantity']),price=product_price)
@@ -195,7 +194,6 @@ def addcart():
 @login_required
 def removecart():
     data = request.form
-    print(data)
     cart = Cart.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
     db.session.delete(cart)
     db.session.commit()
@@ -207,7 +205,6 @@ def removecart():
     cart = Cart.query.filter_by(user_id=current_user.id).all()
     if not cart:
         checker = 0
-    print(checker)
 
     return {"index":int(data['product_id']),"checker":checker,"total":total}
     
@@ -228,7 +225,6 @@ def addwish():
 @login_required
 def removewish():
     data = request.form
-    print(data)
     wish = Wish.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
     db.session.delete(wish)
     db.session.commit()
@@ -238,7 +234,6 @@ def removewish():
     cart = Wish.query.filter_by(user_id=current_user.id).all()
     if not cart:
         checker = 0
-    print(checker)
 
     return {"index":int(data['product_id']),"checker":checker}
     
@@ -340,8 +335,6 @@ def product(product_id):
     comments = []
     rating = []
     
-    print(product.rating)
-    
     ratings = db.engine.execute(text("select User.username, Rating.rating, Rating.comment from Rating left join User on Rating.user_id = User.id where Rating.product_id = " + str(product_id)))
     for r in ratings:
         rating.append(r[1])
@@ -366,7 +359,7 @@ def product(product_id):
     if product.name not in recommended_products:
         product_list = []
     else:
-        recommended_products = topMatches(recommended_products,product.name,3)
+        recommended_products = topMatches(recommended_products,product.name,4)
         product_list = [Product.query.filter_by(name=product[1]).first() for product in recommended_products]
     
     return render_template("product_details.html",recommended_products=product_list,product=product,category=category,ratings=rating,users=users,comments=comments,total=total)
