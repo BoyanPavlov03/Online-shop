@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(120), unique=True, nullable=False)
     login_id = db.Column(db.String(36), nullable=True)
     is_admin = db.Column(db.Integer, default=0, unique=False)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
     @property
     def is_administrator(self):
@@ -33,15 +34,15 @@ class User(db.Model):
         return self.login_id
 
     def __repr__(self):
-        return '<User %r>' % self.username    
-        
+        return '<User %r>' % self.username
+
 class PromoCode(db.Model):
     __tablename__ = 'promocode'
     id = db.Column(Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     type = db.Column(db.String(50), unique=False, nullable=False)
     value = db.Column(db.Integer, unique=False, nullable=False)
-    
+
 class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
@@ -67,13 +68,13 @@ class Cart(db.Model):
     price = db.Column(db.Float, unique=False, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
-    
+
 class Wish(db.Model):
     __tablename__ = 'wish'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey("user.id"))
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
-    
+
 class Rating(db.Model):
     __tablename__ = 'rating'
     id = db.Column(db.Integer, primary_key=True)
@@ -81,7 +82,7 @@ class Rating(db.Model):
     product_id = db.Column(db.Integer, ForeignKey('product.id'))
     comment = db.Column(db.String(300), unique=False, nullable=False)
     rating =  db.Column(db.Integer, unique=False, nullable=False)
-    
+
 class Address(db.Model):
     __tablename__ = 'address'
     id = db.Column(db.Integer, primary_key=True)
