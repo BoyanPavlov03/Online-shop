@@ -14,8 +14,6 @@ from database import db
 from flask_msearch import Search
 from recommendations import sim_pearson,topMatches,transformPrefs
 from decorator import check_confirmed
-
-
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
@@ -27,11 +25,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
 app.config['UPLOAD_FOLDER'] = uploads
 
-sender_mail = 'komisarite.tues@gmail.com'
+sender_mail = 'komisarite.shop@abv.bg'
 sender_pass = 'komisarite123'
 
 mail_settings = {
-    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_SERVER": 'smtp.abv.bg',
     "MAIL_PORT": 465,
     "MAIL_USE_TLS": False,
     "MAIL_USE_SSL": True,
@@ -86,16 +84,28 @@ def send_email(email):
     msg.body = f'Click here to confirm email {link}'
     mail.send(msg)
 
+@app.route('/unconfirmed')
+@login_required
+def unconfirmed():
+    flash("Your email is not confirmed! Please confirm it and try again", 'danger')
+    return render_template("unconfirmed.html")
+
 @app.route('/confirm_email/<token>', methods=['GET','POST'])
 def confirm_email(token):
     try:
-        print("hello")
         email = serializer.loads(token, salt='email-confirm', max_age=3600)
     except SignatureExpired:
-        print("hello1")
-        flash('The confirmation link is invalid or has expired.', 'danger')
-        return '<h1>The token is expired!</h1>'
-    print("hello2")
+        flash('The link for the confirmation is expired! Please register again!', 'danger')
+        return '<h1>The link has expired! Sorry :(</h1>'
+    
+    user = User.query.filter_by(email=email).first()
+    if user.confirmed:
+        flash('User is already confirmed!')
+    else:
+        user.confirmed = True
+        db.session.commit()
+    return redirect(url_for('home'))
+    
 
 @app.route('/admin_register', methods=['GET','POST'])
 def admin_register():
@@ -169,6 +179,7 @@ def search():
 
 @app.route('/addrating/<int:product_id>', methods=['GET','POST'])
 @login_required
+@check_confirmed
 def addrating(product_id):
     if request.method == 'POST':
         rating = request.form.get('rating')
@@ -213,6 +224,7 @@ def applypromocode():
 
 @app.route('/addcart', methods=['GET','POST'])
 @login_required
+@check_confirmed
 def addcart():
     data = request.form
     product = Product.query.filter_by(id=int(data['product_id'])).first()
@@ -237,6 +249,7 @@ def addcart():
 
 @app.route("/removecart", methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def removecart():
     data = request.form
     cart = Cart.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
@@ -255,6 +268,7 @@ def removecart():
 
 @app.route('/addwish', methods=['GET','POST'])
 @login_required
+@check_confirmed
 def addwish():
     data = request.form
     wish = Wish(user_id=current_user.id,product_id=int(data['product_id']))
@@ -268,6 +282,7 @@ def addwish():
 
 @app.route("/removewish", methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def removewish():
     data = request.form
     wish = Wish.query.filter_by(product_id=int(data['product_id']),user_id=current_user.id).first()
@@ -284,6 +299,7 @@ def removewish():
 
 @app.route('/promocode', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def promocode():
     if current_user.is_administrator == False:
         return redirect(url_for('home'))
@@ -306,6 +322,7 @@ def promocode():
 
 @app.route('/newcategory', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def newcategory():
     if current_user.is_administrator == False:
         return redirect(url_for('home'))
@@ -329,6 +346,7 @@ def newcategory():
 
 @app.route('/newproduct', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def newproduct():
     if current_user.is_administrator == False:
         return redirect(url_for('home'))
@@ -411,6 +429,7 @@ def product(product_id):
 
 @app.route('/cart/<int:user_id>')
 @login_required
+@check_confirmed
 def cart(user_id):
     if user_id != current_user.id:
         return redirect(url_for('home'))
@@ -428,6 +447,7 @@ def cart(user_id):
 
 @app.route('/wishlist/<int:user_id>')
 @login_required
+@check_confirmed
 def wishlist(user_id):
     if user_id != current_user.id:
         return redirect(url_for('home'))
@@ -472,6 +492,9 @@ def register():
 
         user = User(email=email,username=username,password=password)
 
+        db.session.add(user)
+        db.session.commit()
+
         send_email(email)
 
         return redirect(url_for('home'))
@@ -504,6 +527,7 @@ def login():
 
 @app.route('/myaddress/<int:user_id>', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def myaddress(user_id):
     address_check = Address.query.filter_by(user_id=current_user.id).first()
     if request.method == "POST":
