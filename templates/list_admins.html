@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %} List of admins {% endblock %}
+
+{% block content %}
+<section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+            <div class="col-first">
+                <h1>List of admins</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="cart" class="cart_area">
+    <div class="container">
+        <div class="cart_inner">
+            <div class="table-responsive">
+                <table id="table" class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Admin Name</th>
+                            <th scope="col">Admin Email</th>
+                            <th scope="col">Activation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <h5>{{user.username}}</h5>
+                                </td>
+                                <td>
+                                    <h5>{{user.email}}</h5>
+                                </td>
+                                <td>
+                                    {% if not user.is_main_admin %}
+                                        {% if user.is_activated %}
+                                            <a href="/activation/{{user.id}}/{{0}}"><button class="gray_btn" style="cursor:pointer">Deactivate</button></a>
+                                        {% else %}
+                                            <a href="/activation/{{user.id}}/{{1}}"><button class="gray_btn" style="cursor:pointer">Activate</button></a>
+                                        {% endif %}
+                                    {% else %}
+                                        <h5>He is always active</h5>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

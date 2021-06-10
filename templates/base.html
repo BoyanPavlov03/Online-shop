@@ -97,7 +97,7 @@
                     if (response['checker'] == 0){
                         document.getElementById("wish").remove();
                     }
-                    
+
                 }
             }).done(function(){console.log('success');})
         }
@@ -112,7 +112,7 @@
             <nav class="navbar navbar-expand-lg navbar-light main_box">
                 <div class="container">
                     <a class="navbar-brand logo_h" href="/home"><img src="../static/img/logo.png" alt=""></a>
-                    
+
                     <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
                         <ul class="nav navbar-nav menu_nav ml-auto">
                             <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
@@ -120,20 +120,26 @@
                             <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
                             {% else %}
+                                {% if not current_user.is_receiving %}
+                                    <li class="nav-item"><a class="nav-link" href="/activate/{{current_user.id}}">Activate Newsletter</a></li>
+                                {% else %}
+                                    <li class="nav-item"><a class="nav-link" href="/deactivate/{{current_user.id}}">Deactivate Newsletter</a></li>
+                                {% endif %}
                             <li class="nav-item"><a class="nav-link" href="/wishlist/{{current_user.id}}">WishList</a></li>
                             <li class="nav-item"><a class="nav-link" href="/myaddress/{{current_user.id}}">My Address</a></li>
                             <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                             {% endif %}
-                            {% if current_user.is_administrator %}
+                            {% if current_user.is_active and current_user.is_activated %}
                             <li class="nav-item submenu dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin Settings</a>
                                 <ul class="dropdown-menu">
                                     <li class="nav-item"><a class="nav-link" href="/newcategory">New Category</a></li>
                                     <li class="nav-item"><a class="nav-link" href="/newproduct">New Product</a></li>
-                                    {% if current_user.id == 1 %}
-                                    <li class="nav-item"><a class="nav-link" href="/admin_register">Register an admin</a></li>
-                                    {% endif %}
                                     <li class="nav-item"><a class="nav-link" href="/promocode">Create a promo code</a></li>
+                                    {% if current_user.is_main_admin %}
+                                    <li class="nav-item"><a class="nav-link" href="/admin_register">Register an admin</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/admin_list">List of admins</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
                             {% endif %}
@@ -160,7 +166,7 @@
             </div>
         </div>
     </header>
-    
+
     {% block content %}
     {% endblock %}
 

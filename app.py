@@ -6,6 +6,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 import uuid
 import os
 from sqlalchemy import text
+from threading import Thread
 
 
 from models import User, Product, Address, Category, Cart, Wish, Rating, PromoCode
@@ -25,7 +26,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "safdgsrtbywrtybytjnbhw5yh5646454"
 app.config['UPLOAD_FOLDER'] = uploads
 
-sender_mail = 'komisarite.shop@abv.bg'
+sender_mail = 'tues.komisarite@abv.bg'
 sender_pass = 'komisarite123'
 
 mail_settings = {
@@ -49,7 +50,7 @@ serializer = URLSafeTimedSerializer(app.secret_key)
 
 with app.app_context():
     db.create_all()
-    admin = User(email="admin@gmail.com",username="admin",password=generate_password_hash("1234"),is_admin=1,confirmed=True)
+    admin = User(email="admin@gmail.com",username="admin",password=generate_password_hash("1234"),is_admin=1,confirmed=True,admin_activation=True)
     admin_check = User.query.filter_by(email=admin.email).first()
     if not admin_check:
         db.session.add(admin)
@@ -77,17 +78,55 @@ def get_total_price():
 def validate_file_type(filename, allowed_types):
     return filename.split(".")[-1] in allowed_types
 
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
 def send_email(email):
     token = serializer.dumps(email, salt='email-confirm')
     msg = Message('Confirm Email', sender=sender_mail, recipients=[email])
     link = url_for('confirm_email', token=token, _external=True)
     msg.body = f'Click here to confirm email {link}'
-    mail.send(msg)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+
+def newsletter(product, email):
+    msg = Message('A new product has been added', sender=sender_mail, recipients=[email])
+    link = url_for('product', product_id=str(product.id), _external=True)
+    msg.body = f'Here is a link to the new product {link}'
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+
+@app.route('/deactivate/<int:user_id>')
+def deactivate(user_id):
+    if current_user.id == user_id:
+        user = User.query.filter_by(id=user_id).first()
+        user.received = False
+
+        db.session.commit()
+
+    return redirect(url_for('home'))
+
+@app.route('/activate/<int:user_id>')
+def activate(user_id):
+    if current_user.id == user_id:
+        user = User.query.filter_by(id=user_id).first()
+        user.received = True
+
+        db.session.commit()
+
+    return redirect(url_for('home'))
+
+@app.route('/resend/<int:user_id>')
+def resend(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    send_email(user.email)
+
+    return redirect(url_for('unconfirmed'))
 
 @app.route('/unconfirmed')
 @login_required
 def unconfirmed():
-    flash("Your email is not confirmed! Please confirm it and try again", 'danger')
     return render_template("unconfirmed.html")
 
 @app.route('/confirm_email/<token>', methods=['GET','POST'])
@@ -97,15 +136,12 @@ def confirm_email(token):
     except SignatureExpired:
         flash('The link for the confirmation is expired! Please register again!', 'danger')
         return '<h1>The link has expired! Sorry :(</h1>'
-    
+
     user = User.query.filter_by(email=email).first()
-    if user.confirmed:
-        flash('User is already confirmed!')
-    else:
+    if not user.confirmed:
         user.confirmed = True
         db.session.commit()
-    return redirect(url_for('home'))
-    
+    return redirect(url_for('logout'))
 
 @app.route('/admin_register', methods=['GET','POST'])
 def admin_register():
@@ -139,9 +175,38 @@ def admin_register():
         db.session.add(user)
         db.session.commit()
 
+        send_email(email)
+
         return redirect(url_for('home'))
 
     return render_template("admin_register.html")
+
+@app.route('/admin_list', methods=['GET', 'POST'])
+def admin_list():
+    if not current_user.is_main_admin:
+        return redirect(url_for('home'))
+
+    users = User.query.filter_by(is_admin=1, confirmed=1).all()
+
+    return render_template("list_admins.html",users=users)
+
+@app.route('/activation/<int:user_id>/<int:purpose>')
+def activation(user_id, purpose):
+    if not current_user.is_main_admin:
+        return redirect(url_for('home'))
+
+    user = User.query.filter_by(id=user_id).first()
+
+    print(purpose)
+
+    if purpose:
+        user.admin_activation = True
+    else:
+        user.admin_activation = False
+
+    db.session.commit()
+
+    return redirect(url_for('admin_list'))
 
 @app.route('/')
 def index():
@@ -301,7 +366,7 @@ def removewish():
 @login_required
 @check_confirmed
 def promocode():
-    if current_user.is_administrator == False:
+    if current_user.is_activated == False:
         return redirect(url_for('home'))
 
     if request.method == 'POST':
@@ -324,7 +389,7 @@ def promocode():
 @login_required
 @check_confirmed
 def newcategory():
-    if current_user.is_administrator == False:
+    if current_user.is_activated == False:
         return redirect(url_for('home'))
 
     if request.method == 'POST':
@@ -348,7 +413,7 @@ def newcategory():
 @login_required
 @check_confirmed
 def newproduct():
-    if current_user.is_administrator == False:
+    if current_user.is_activated == False:
         return redirect(url_for('home'))
 
     if request.method == 'POST':
@@ -373,6 +438,13 @@ def newproduct():
         product = Product(name=name,short_description=short_description,description=description,price=price,rating=0,category_id=category,img=image)
         db.session.add(product)
         db.session.commit()
+
+        users = User.query.filter_by(received=True).all()
+        product = Product.query.filter_by(name=name).first()
+
+        for user in users:
+            newsletter(product, user.email, user.id)
+
         return redirect(url_for('home'))
 
     return render_template('newproduct.html',categories = Category.query.all())

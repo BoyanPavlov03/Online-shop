@@ -11,6 +11,26 @@ class User(db.Model):
     login_id = db.Column(db.String(36), nullable=True)
     is_admin = db.Column(db.Integer, default=0, unique=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    admin_activation = db.Column(db.Boolean, nullable=False, default=False)
+    received = db.Column(db.Boolean, nullable=False, default=True)
+
+    @property
+    def is_receiving(self):
+        if self.received:
+            return True
+        return False
+
+    @property
+    def is_main_admin(self):
+        if self.id == 1:
+            return True
+        return False
+
+    @property
+    def is_activated(self):
+        if self.is_admin and self.admin_activation:
+            return True
+        return False
 
     @property
     def is_administrator(self):
