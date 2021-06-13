@@ -190,23 +190,19 @@ def admin_list():
 
     return render_template("list_admins.html",users=users)
 
-@app.route('/activation/<int:user_id>/<int:purpose>')
-def activation(user_id, purpose):
-    if not current_user.is_main_admin:
-        return redirect(url_for('home'))
+@app.route('/activation', methods=['GET', 'POST'])
+def activation():
+    data = request.form
 
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=data['id']).first()
 
-    print(purpose)
-
-    if purpose:
+    if int(data['purpose']) == 1:
         user.admin_activation = True
     else:
         user.admin_activation = False
 
     db.session.commit()
-
-    return redirect(url_for('admin_list'))
+    return {}
 
 @app.route('/')
 def index():
@@ -443,7 +439,7 @@ def newproduct():
         product = Product.query.filter_by(name=name).first()
 
         for user in users:
-            newsletter(product, user.email, user.id)
+            newsletter(product, user.email)
 
         return redirect(url_for('home'))
 

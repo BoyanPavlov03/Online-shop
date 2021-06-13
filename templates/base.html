@@ -45,8 +45,6 @@
                 $("#quantity".concat(a)).val(1)
             } })
         }
-    </script>
-    <script type=text/javascript>
         function addtowish(a){
             $.ajax({
                 type:"POST",
@@ -54,8 +52,6 @@
                 data:{"product_id":a}
             }).done(function(){console.log('success')})
         }
-    </script>
-    <script>
         function applypromocode(){
             $.ajax({
                 type:"POST",
@@ -69,8 +65,21 @@
                 $("#code").val("")
             } })
         }
-    </script>
-    <script type=text/javascript>
+        function activation(a){
+            var b = (document.getElementById(a).innerHTML == "Deactivate") ? 0 : 1;
+            $.ajax({
+                type:"POST",
+                url:"http://localhost:5000/activation",
+                data:{"id":a,"purpose": b},
+                success: function(response){
+                    if (document.getElementById(a).innerHTML == "Deactivate") {
+                        document.getElementById(a).innerHTML = "Activate";
+                    } else {
+                        document.getElementById(a).innerHTML = "Deactivate";
+                    }
+                }
+            }).done(function(){console.log('success'); })
+        }
         function removecart(a){
             $.ajax({
                 type:"POST",
@@ -85,8 +94,6 @@
                 }
             }).done(function(){console.log('success');})
         }
-    </script>
-    <script type=text/javascript>
         function removewish(a){
             $.ajax({
                 type:"POST",
@@ -120,10 +127,12 @@
                             <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
                             {% else %}
-                                {% if not current_user.is_receiving %}
-                                    <li class="nav-item"><a class="nav-link" href="/activate/{{current_user.id}}">Activate Newsletter</a></li>
-                                {% else %}
-                                    <li class="nav-item"><a class="nav-link" href="/deactivate/{{current_user.id}}">Deactivate Newsletter</a></li>
+                                {% if not current_user.is_main_admin %}
+                                    {% if not current_user.is_receiving %}
+                                        <li class="nav-item"><a class="nav-link" href="/activate/{{current_user.id}}">Activate Newsletter</a></li>
+                                    {% else %}
+                                        <li class="nav-item"><a class="nav-link" href="/deactivate/{{current_user.id}}">Deactivate Newsletter</a></li>
+                                    {% endif %}
                                 {% endif %}
                             <li class="nav-item"><a class="nav-link" href="/wishlist/{{current_user.id}}">WishList</a></li>
                             <li class="nav-item"><a class="nav-link" href="/myaddress/{{current_user.id}}">My Address</a></li>

@@ -36,11 +36,13 @@
                                 </td>
                                 <td>
                                     {% if not user.is_main_admin %}
-                                        {% if user.is_activated %}
-                                            <a href="/activation/{{user.id}}/{{0}}"><button class="gray_btn" style="cursor:pointer">Deactivate</button></a>
-                                        {% else %}
-                                            <a href="/activation/{{user.id}}/{{1}}"><button class="gray_btn" style="cursor:pointer">Activate</button></a>
-                                        {% endif %}
+                                            <button id="{{user.id}}" class="gray_btn" style="cursor:pointer" onClick="activation({{user.id}})">
+                                                {% if user.is_activated %}
+                                                    Deactivate
+                                                {% else %}
+                                                    Activate
+                                                {% endif %}
+                                            </button>
                                     {% else %}
                                         <h5>He is always active</h5>
                                     {% endif %}
